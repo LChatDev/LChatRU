@@ -4,7 +4,7 @@
 
 ## Установка
 
-Скачайте **LChat-2.0.4-universal.apk** на [странице релиза](https://github.com/leosmleol-svg/LChat/releases/tag/android-v2.0.4). Это один APK, а не набор split-пакетов. Его можно установить поверх версии 2.0.3: имя пакета и сертификат подписи совпадают.
+Скачайте **LChat-2.0.4-universal.apk** на [странице релиза](https://github.com/LChatDev/LChat/releases/tag/android-v2.0.4). Это один APK, а не набор split-пакетов. Его можно установить поверх версии 2.0.3: имя пакета и сертификат подписи совпадают.
 
 - Android 8.0 и новее (минимальный SDK 26, целевой SDK 35); ARM64, ARMv7, x86 и x86_64.
 - Пакет `su.lbs.lchat`, версия `2.0.4`, код версии `15`.
@@ -25,7 +25,7 @@ Get-FileHash .\LChat-2.0.4-universal.apk -Algorithm SHA256
 
 ## Сборка исходников на Windows
 
-Исходники Android находятся в [репозитории LChat](https://github.com/leosmleol-svg/LChat/tree/main/android). Потребуются JDK 21 (`javac`, `java`, `jar`, `keytool`), Android SDK Platform 35 (`android.jar`), Build Tools 35.0.0 (`aapt2`, `zipalign`, `lib/d8.jar`, `lib/apksigner.jar`), Node.js и распакованный AAR `io.github.webrtc-sdk:android:150.7871.01` с `classes.jar` и `jni/{arm64-v8a,armeabi-v7a,x86,x86_64}/libjingle_peerconnection_so.so`.
+Исходники Android находятся в [репозитории LChat](https://github.com/LChatDev/LChat/tree/main/android). Потребуются JDK 21 (`javac`, `java`, `jar`, `keytool`), Android SDK Platform 35 (`android.jar`), Build Tools 35.0.0 (`aapt2`, `zipalign`, `lib/d8.jar`, `lib/apksigner.jar`), Node.js и распакованный AAR `io.github.webrtc-sdk:android:150.7871.01` с `classes.jar` и `jni/{arm64-v8a,armeabi-v7a,x86,x86_64}/libjingle_peerconnection_so.so`.
 
 Из корня клонированного репозитория LChat выполните, заменив пути своими:
 

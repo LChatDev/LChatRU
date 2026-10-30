@@ -27,7 +27,7 @@ sudo systemctl enable --now apache2 mariadb
 Скачайте код **за пределами** публичной папки и скопируйте веб-файлы без `.git`:
 
 ```sh
-sudo git clone https://github.com/leosmleol-svg/LChatRU.git /opt/lchat-source
+sudo git clone https://github.com/LChatDev/LChatRU.git /opt/lchat-source
 sudo mkdir -p /var/www/lchat
 sudo rsync -a --exclude='.git/' --exclude='android/' --exclude='tools/' /opt/lchat-source/ /var/www/lchat/
 sudo cp /var/www/lchat/config.example.php /var/www/lchat/config.php
