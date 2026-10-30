@@ -56,7 +56,7 @@ try {
     if ($action === 'me') {
         $user = $ctx['uid'] ? one('SELECT id, username, name FROM users WHERE id = ?', [$ctx['uid']]) : null;
         if ($user) $user['is_admin'] = service_is_admin($user);
-        result(['user' => $user, 'csrf' => $ctx['csrf'], 'registration_open' => site_settings()['registration_open'], 'public_url' => config()['public_url'] ?? '', 'call_state' => account_call_state($ctx['uid'])]);
+        result(['user' => $user, 'csrf' => $ctx['csrf'], 'site_name' => site_settings()['site_name'], 'registration_open' => site_settings()['registration_open'], 'public_url' => config()['public_url'] ?? '', 'call_state' => account_call_state($ctx['uid'])]);
     }
     if ($action === 'register' || $action === 'login') {
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';

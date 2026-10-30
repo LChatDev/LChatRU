@@ -86,6 +86,7 @@ async function boot(verifiedSession=null){
   let bootData;
   try{bootData=verifiedSession||await api('me');reconnectDelay=2500;}
   catch(e){show('auth-error',false);view(me?'messenger':'auth');if(me)connection(false);if(!authBusy)reconnectTimer=setTimeout(()=>boot().catch(report),reconnectDelay);reconnectDelay=Math.min(reconnectDelay*2,30000);return;}
+  if(typeof bootData.site_name==='string'&&bootData.site_name.trim()){const name=bootData.site_name.trim();document.querySelectorAll('[data-site-name]').forEach(el=>el.textContent=name);document.querySelectorAll('[data-site-initial]').forEach(el=>el.textContent=Array.from(name)[0].toUpperCase());document.title=name+' — ближе друг к другу';}
   csrf=bootData.csrf;me=bootData.user;updateAccountState(bootData.call_state);publicBase=bootData.public_url?.startsWith('https://')?bootData.public_url:'';$('register-tab').hidden=!bootData.registration_open;document.dispatchEvent(new CustomEvent('lchat-user-ready',{detail:{user:me}}));
   if(trackerUser!==Number(me?.id||0)){trackerUser=Number(me?.id||0);snapshotReady=false;incomingSeen.clear();lastReadSent.clear();sidebarSignature='';}
   const params=new URLSearchParams(location.search);

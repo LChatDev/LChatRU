@@ -3,6 +3,8 @@
 // Room signaling and call UI are bundled copies of the current LChat implementation.
 declare(strict_types=1);
 define('LCHAT_INTERNAL', true);
+require_once __DIR__ . '/apis/frontend_mode.php';
+if (!isset($_GET['action']) && frontend_is_remote()) { require __DIR__ . '/admin-pc.php'; exit; }
 require __DIR__ . '/app.php';
 require __DIR__ . '/apis/sync.php';
 

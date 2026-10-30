@@ -4,7 +4,7 @@ if (!defined('LCHAT_INTERNAL')) { http_response_code(404); exit; }
 
 // The public website proxies only LChat PHP endpoints, never an arbitrary URL.
 function backend_gateway(): void {
-    if (PHP_SAPI === 'cli') return;
+    if (PHP_SAPI === 'cli' || (defined('LCHAT_LOCAL_PAGE') && LCHAT_LOCAL_PAGE)) return;
     // The website shell is served locally without accessing the backend configuration.
     if (basename((string)($_SERVER['SCRIPT_NAME'] ?? '')) === 'index.php') return;
     $settings = config()['backend'] ?? ['mode' => 'host'];
@@ -23,7 +23,11 @@ function backend_gateway(): void {
     if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 10 * 1024 * 1024) fail(413, 'Слишком большой запрос.');
     $destination = rtrim($url, '/') . '/' . $file;
     if (!empty($_SERVER['QUERY_STRING'])) $destination .= '?' . $_SERVER['QUERY_STRING'];
-    $headers = ['X-LChat-Gateway: 1', 'Accept-Encoding: identity'];
+    $secret = (string)($settings['proxy_secret'] ?? '');
+    if (strlen($secret) < 32 || str_starts_with($secret, 'REPLACE_') || preg_match('/[\x00-\x20\x7f]/', $secret)) fail(503, 'Укажите общий секрет шлюза длиной не менее 32 символов.');
+    $clientIp = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+    if (!filter_var($clientIp, FILTER_VALIDATE_IP)) fail(503, 'Не удалось определить адрес клиента.');
+    $headers = ['X-LChat-Gateway: 1', 'X-LChat-Proxy-Key: ' . $secret, 'X-LChat-Client-IP: ' . $clientIp, 'Accept-Encoding: identity'];
     foreach (['HTTP_COOKIE' => 'Cookie', 'HTTP_AUTHORIZATION' => 'Authorization', 'REDIRECT_HTTP_AUTHORIZATION' => 'Authorization', 'HTTP_X_LCHAT_BOT_TOKEN' => 'X-LChat-Bot-Token', 'HTTP_X_CSRF_TOKEN' => 'X-CSRF-Token', 'HTTP_RANGE' => 'Range', 'HTTP_IF_NONE_MATCH' => 'If-None-Match'] as $key => $name) {
         if (!empty($_SERVER[$key]) && !str_contains($_SERVER[$key], "\r") && !str_contains($_SERVER[$key], "\n")) $headers[$name] = $name . ': ' . $_SERVER[$key];
     }

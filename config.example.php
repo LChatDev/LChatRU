@@ -4,13 +4,15 @@ if (!defined('LCHAT_INTERNAL')) { http_response_code(404); exit; }
 
 return [
     // Сервер запросов: host — хостинг; pc — HTTPS-сервер на вашем ПК.
-    'backend' => ['mode' => 'host', 'url' => ''],
+    'backend' => ['mode' => 'host', 'url' => '', 'proxy_secret' => ''],
     'database' => [
         'dsn' => 'mysql:host=localhost;port=3306;dbname=YOUR_DATABASE;charset=utf8mb4',
         'username' => 'YOUR_DATABASE_USER',
         'password' => 'YOUR_DATABASE_PASSWORD',
     ],
     'install_key' => 'REPLACE_WITH_A_LONG_RANDOM_SECRET',
+    // Shared secret for authenticated gateway requests to this backend.
+    'proxy_secret' => '',
     // Название в веб-интерфейсе; по умолчанию LChat.
     'site_name' => 'LChat',
     // Логин пользователя, который станет владельцем при новой установке.

@@ -67,6 +67,16 @@ function request_is_https(): bool {
     if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') return true;
     return getenv('LCHAT_TRUST_LOCAL_PROXY') === '1' && in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
 }
+function authenticate_web_gateway(): void {
+    if (empty($_SERVER['HTTP_X_LCHAT_GATEWAY'])) return;
+    if ((config()['backend']['mode'] ?? 'host') === 'pc') fail(508, 'Backend proxy loop detected.');
+    $secret = (string)(config()['proxy_secret'] ?? '');
+    $supplied = (string)($_SERVER['HTTP_X_LCHAT_PROXY_KEY'] ?? '');
+    $ip = (string)($_SERVER['HTTP_X_LCHAT_CLIENT_IP'] ?? '');
+    if (strlen($secret) < 32 || str_starts_with($secret, 'REPLACE_') || !hash_equals($secret, $supplied) || !filter_var($ip, FILTER_VALIDATE_IP)) fail(403, 'Доступ к шлюзу запрещён.');
+    $_SERVER['REMOTE_ADDR'] = $ip;
+}
+authenticate_web_gateway();
 function session_open(): void {
     if (session_status() === PHP_SESSION_ACTIVE) return;
     session_name(config()['session_name'] ?? 'lchat_session');
