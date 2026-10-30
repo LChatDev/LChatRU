@@ -30,3 +30,12 @@
 Перед обновлением создайте резервную копию базы, конфига, `data` и `files`. Существующий `config.php` заменять не нужно.
 
 Интерфейс содержит компоненты Telegram Web A; информация об исходниках приведена в [TELEGRAM_SOURCE.md](TELEGRAM_SOURCE.md). Лицензия — [GPL-3.0](LICENSE).
+
+## Руководства / Guides
+
+- Windows: [Русский](WINDOWS_HOST_RU.md) · [English](WINDOWS_HOST_EN.md)
+- Открытие портов и туннели / Port forwarding and tunnels: [Русский](PORT_TOOLS_RU.md) · [English](PORT_TOOLS_EN.md)
+- Звонки и TURN / Calls and TURN: [Русский](CALLS_RU.md) · [English](CALLS_EN.md)
+- Бесплатный хостинг / Free hosting: [Русский](FREE_HOSTING_RU.md) · [English](FREE_HOSTING_EN.md)
+
+Дополнительные репозитории / Dedicated guides: [LChatCalls](https://github.com/LChatDev/LChatCalls) · [LChatFree](https://github.com/LChatDev/LChatFree).
