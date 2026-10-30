@@ -20,7 +20,10 @@ function backend_gateway(): void {
     if (!in_array($file, $allowed, true)) fail(404, 'Страница не найдена.');
     $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
     if (!in_array($method, ['GET','POST','HEAD'], true)) fail(405, 'Метод не поддерживается.');
-    if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 10 * 1024 * 1024) fail(413, 'Слишком большой запрос.');
+    $action = (string)($_GET['action'] ?? ''); $methodName = (string)($_GET['method'] ?? '');
+    $largeText = ($file === 'api.php' && in_array($action, ['message.send', 'message.edit'], true)) || ($file === 'admin.php' && $action === 'chat.send') || ($file === 'bot-api.php' && in_array($methodName, ['sendMessage', 'editMessageText'], true));
+    $maxBody = $largeText ? 64 * 1024 * 1024 : 10 * 1024 * 1024;
+    if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > $maxBody) fail(413, 'Слишком большой запрос.');
     $destination = rtrim($url, '/') . '/' . $file;
     if (!empty($_SERVER['QUERY_STRING'])) $destination .= '?' . $_SERVER['QUERY_STRING'];
     $secret = (string)($settings['proxy_secret'] ?? '');
@@ -41,21 +44,21 @@ function backend_gateway(): void {
                 $body[$name] = new CURLFile($fileInfo['tmp_name'], (string)($fileInfo['type'] ?? 'application/octet-stream'), (string)($fileInfo['name'] ?? 'file'));
             }
         } else {
-            $body = file_get_contents('php://input', false, null, 0, 10 * 1024 * 1024 + 1);
-            if ($body === false || strlen($body) > 10 * 1024 * 1024) fail(413, 'Слишком большой запрос.');
+            $body = file_get_contents('php://input', false, null, 0, $maxBody + 1);
+            if ($body === false || strlen($body) > $maxBody) fail(413, 'Слишком большой запрос.');
             if ($type !== '' && !str_contains($type, "\r") && !str_contains($type, "\n")) $headers[] = 'Content-Type: ' . $type;
         }
     }
     $received = []; $size = 0; $temp = fopen('php://temp/maxmemory:2097152', 'w+b');
     $ch = curl_init($destination);
-    curl_setopt_array($ch, [CURLOPT_HTTPHEADER => array_values($headers), CURLOPT_CUSTOMREQUEST => $method, CURLOPT_FOLLOWLOCATION => false, CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 60, CURLOPT_SSL_VERIFYPEER => true, CURLOPT_SSL_VERIFYHOST => 2, CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
+    curl_setopt_array($ch, [CURLOPT_HTTPHEADER => array_values($headers), CURLOPT_CUSTOMREQUEST => $method, CURLOPT_FOLLOWLOCATION => false, CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 180, CURLOPT_SSL_VERIFYPEER => true, CURLOPT_SSL_VERIFYHOST => 2, CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
         CURLOPT_HEADERFUNCTION => static function ($handle, string $line) use (&$received): int {
             if (str_starts_with($line, 'HTTP/')) $received = [];
             elseif (str_contains($line, ':')) { [$name, $value] = explode(':', $line, 2); $received[] = [strtolower(trim($name)), trim($value)]; }
             return strlen($line);
         },
         CURLOPT_WRITEFUNCTION => static function ($handle, string $chunk) use (&$size, $temp): int {
-            $size += strlen($chunk); if ($size > 12 * 1024 * 1024) return 0;
+            $size += strlen($chunk); if ($size > 64 * 1024 * 1024) return 0;
             return fwrite($temp, $chunk);
         },
     ]);
