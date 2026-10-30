@@ -9,14 +9,14 @@ return [
         'password' => 'YOUR_DATABASE_PASSWORD',
     ],
     'install_key' => 'REPLACE_WITH_A_LONG_RANDOM_SECRET',
-    // Public name shown in the web interface. Existing installations default to LChat.
+    // Название в веб-интерфейсе; по умолчанию LChat.
     'site_name' => 'LChat',
-    // The registered user who becomes owner on a fresh installation.
+    // Логин пользователя, который станет владельцем при новой установке.
     'initial_admin_username' => 'leosmleol',
     'registration_open' => true,
     'session_name' => 'lchat_session',
     'session_domain' => '',
-    // WebRTC uses a mesh connection; keep group calls small.
+    // WebRTC соединяет участников друг с другом; используйте небольшой лимит.
     'max_call_participants' => 8,
     'ice_servers' => [
         ['urls' => 'stun:stun.l.google.com:19302'],

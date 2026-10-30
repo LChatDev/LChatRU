@@ -17,11 +17,11 @@
 
 ## Инструкции
 
-- [Установка на хостинге](https://github.com/leosmleol-svg/LChat/blob/main/HOSTING.md) — английская инструкция.
-- [Бесплатное размещение сайта, базы и TURN](https://github.com/leosmleol-svg/LChat/blob/main/FREE_HOSTING.md) — английская инструкция; бесплатный тариф зависит от условий провайдера.
-- [Настройка звонков и TURN](https://github.com/leosmleol-svg/LChat/blob/main/CALLS.md) и [способы открыть доступ к серверу](https://github.com/leosmleol-svg/LChat/blob/main/TUNNELS.md).
+- [Установка на хостинге](HOSTING.md).
+- [Бесплатное размещение сайта, базы и TURN](FREE_HOSTING.md); бесплатный тариф зависит от условий провайдера.
+- [Настройка звонков и TURN](CALLS.md) и [способы открыть доступ к серверу](TUNNELS.md).
 - [Документация Bot API](BOT_API.md) и страница `docs.php` на сайте.
-- [Android APK](https://github.com/leosmleol-svg/LChat/releases/tag/android-v2.0.4) — существующее нативное приложение.
+- [Android-приложение](ANDROID.md): установка, ограничения и сборка APK.
 
 Перед обновлением создайте резервную копию базы, конфига, `data` и `files`. Существующий `config.php` заменять не нужно.
 

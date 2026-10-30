@@ -1,6 +1,6 @@
 # LChat Bot API
 
-Публичная HTML-документация для хостинга: `https://chat.lbs.su/docs.php`.
+Публичная HTML-документация для хостинга: `https://your-domain.example/docs.php`.
 
 В мессенджере найдите `@BotCreator` или нажмите **🤖 Мои боты → Написать @BotCreator**. Команда `/newbot` пошагово спрашивает имя и логин и выдаёт API-токен. `/mybots` показывает ваших ботов; `/token @имябота` выпускает новый токен и сразу отключает старый; `/setname @имябота Новое имя` меняет имя; `/cancel` отменяет создание.
 
@@ -8,7 +8,7 @@ Bot API работает на том же PHP-хостинге, что и сай
 
 Откройте личный чат с ботом или добавьте его в свою группу/канал через «Мои боты». Бот получает только сообщения чатов, в которых состоит, и только после вступления. Участники видят отправителя как отдельный аккаунт бота.
 
-Основной путь: `https://chat.lbs.su/bot<TOKEN>/<METHOD>`. Если хостинг не применяет правила `.htaccess`, используйте `https://chat.lbs.su/bot-api.php?token=<TOKEN>&method=<METHOD>`. Для уменьшения попадания токена в URL и журналы запросов можно передать `Authorization: Bearer <TOKEN>` и указать только `?method=<METHOD>`.
+Основной путь: `https://your-domain.example/bot<TOKEN>/<METHOD>`. Если хостинг не применяет правила `.htaccess`, используйте `https://your-domain.example/bot-api.php?token=<TOKEN>&method=<METHOD>`. Для уменьшения попадания токена в URL и журналы запросов можно передать `Authorization: Bearer <TOKEN>` и указать только `?method=<METHOD>`.
 
 Ответ всегда JSON: `{"ok":true,"result":...}` или `{"ok":false,"error_code":400,"description":"..."}`. Текстовые методы принимают JSON или обычные поля формы. Токен храните как пароль; не вставляйте его в клиентский JavaScript или публичную страницу.
 
@@ -44,9 +44,9 @@ Bot API работает на том же PHP-хостинге, что и сай
 ## Пример
 
 ```bash
-curl -H "Authorization: Bearer ВАШ_ТОКЕН" "https://chat.lbs.su/bot-api.php?method=getMe"
-curl -H "Authorization: Bearer ВАШ_ТОКЕН" "https://chat.lbs.su/bot-api.php?method=getUpdates&offset=0"
-curl -X POST -H "Authorization: Bearer ВАШ_ТОКЕН" -H "Content-Type: application/json" -d '{"chat_id":123,"text":"Привет!"}' "https://chat.lbs.su/bot-api.php?method=sendMessage"
+curl -H "Authorization: Bearer ВАШ_ТОКЕН" "https://your-domain.example/bot-api.php?method=getMe"
+curl -H "Authorization: Bearer ВАШ_ТОКЕН" "https://your-domain.example/bot-api.php?method=getUpdates&offset=0"
+curl -X POST -H "Authorization: Bearer ВАШ_ТОКЕН" -H "Content-Type: application/json" -d '{"chat_id":123,"text":"Привет!"}' "https://your-domain.example/bot-api.php?method=sendMessage"
 ```
 
 `chat_id` берите из `message.chat.id` ответа `getUpdates` или результата `getChat`. Запускайте опрос с паузой между запросами и сохраняйте последний offset на стороне своего бота.

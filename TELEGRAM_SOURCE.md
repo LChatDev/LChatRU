@@ -1,13 +1,13 @@
-# Telegram Web A source used in LChat
+# Исходники Telegram Web A в LChat
 
-LChat remains a separate PHP messenger. It does not connect to Telegram accounts or Telegram servers.
+LChat — самостоятельный PHP-мессенджер. Он не подключается к аккаунтам и серверам Telegram.
 
-The following UI components were adapted from the [official Telegram Web A source](https://github.com/TelegramOrg/Telegram-web-z), commit `f67a40879a7d78c2683ec5a296cf55bc22417d56` (called “Telegram Web A” in that repository's README):
+Следующие компоненты адаптированы из [официальных исходников Telegram Web A](https://github.com/TelegramOrg/Telegram-web-z), коммит `f67a40879a7d78c2683ec5a296cf55bc22417d56`:
 
-- `assets/weba-icons.woff2` is copied from `src/styles/icons.woff2`.
-- `assets/weba-pattern.svg` is copied from `src/assets/pattern.svg`.
-- `assets/weba-fonts/` contains the Roboto CSS and WOFF2 subsets from `src/assets/fonts/`.
-- Icon code points in `assets/app.js` and `assets/weba-ui.js` follow `src/styles/icons.scss`.
-- Color tokens, the 64 px column header, 760 px message area, 464 px message limit, 48 px composer, 15 px message corner radius, and motion timings in `assets/weba.css` follow `src/styles/index.scss`, `src/styles/_variables.scss`, `src/styles/_composer-primitives.scss`, and the relevant component styles. They are adapted to LChat's existing PHP interface and features.
+- `assets/weba-icons.woff2` скопирован из `src/styles/icons.woff2`.
+- `assets/weba-pattern.svg` скопирован из `src/assets/pattern.svg`.
+- `assets/weba-fonts/` содержит CSS Roboto и подмножества WOFF2 из `src/assets/fonts/`.
+- Коды иконок в `assets/app.js` и `assets/weba-ui.js` основаны на `src/styles/icons.scss`.
+- Цвета, заголовок 64 px, область сообщений 760 px, ширина сообщения до 464 px, поле ввода 48 px, радиус сообщения 15 px и времена анимаций в `assets/weba.css` основаны на `src/styles/index.scss`, `src/styles/_variables.scss`, `src/styles/_composer-primitives.scss` и стилях компонентов. Они адаптированы к интерфейсу и функциям LChat.
 
-Telegram Web A is distributed under the GNU General Public License version 3. The corresponding license is included in [LICENSE](LICENSE). This LChat source distribution is available under GPL-3.0. Telegram's names and logos are not used for LChat branding.
+Telegram Web A распространяется под GNU General Public License версии 3; текст лицензии приведён в [LICENSE](LICENSE). Эти исходники LChat распространяются под GPL-3.0. Названия и логотипы Telegram не используются в оформлении LChat.
