@@ -27,7 +27,7 @@ function config(): array {
     return $config;
 }
 function site_name(): string {
-    try { $name = site_settings()['site_name']; }
+    try { $name = (config()['backend']['mode'] ?? 'host') === 'pc' ? (config()['site_name'] ?? 'LChat') : site_settings()['site_name']; }
     catch (Throwable $e) { $name = config()['site_name'] ?? 'LChat'; }
     return is_string($name) && trim($name) !== '' ? mb_substr(trim($name), 0, 60, 'UTF-8') : 'LChat';
 }
@@ -151,6 +151,8 @@ function transaction(callable $action): mixed {
     try { $value = $action(); db()->commit(); return $value; }
     catch (Throwable $e) { if (db()->inTransaction()) db()->rollBack(); throw $e; }
 }
+require_once __DIR__ . '/apis/backend_gateway.php';
+backend_gateway();
 require_once __DIR__ . '/apis/features.php';
 require_once __DIR__ . '/apis/bot_accounts.php';
 require_once __DIR__ . '/apis/bot_creator.php';
