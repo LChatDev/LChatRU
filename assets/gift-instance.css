@@ -1,0 +1,4 @@
+.unique-gift{position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(circle at 30% 20%,hsl(var(--gift-hue) 75% 67% / .35),transparent 64%),linear-gradient(145deg,hsl(var(--gift-hue) 45% 27%),#172637)!important;border:1px solid hsl(var(--gift-hue) 70% 75% / .28)!important}
+.gift-fingerprint{position:absolute!important;inset:0;width:100%!important;height:100%!important;z-index:-1;fill:#fff;opacity:.12;pointer-events:none}
+.unique-gift>small{letter-spacing:.04em;color:#d9e8fa!important;font-size:10px!important;overflow-wrap:anywhere}
+.verified-badge{color:#68b5ff;font-weight:800}

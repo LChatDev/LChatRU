@@ -174,6 +174,7 @@ function transaction(callable $action): mixed {
 require_once __DIR__ . '/apis/backend_gateway.php';
 backend_gateway();
 require_once __DIR__ . '/apis/features.php';
+require_once __DIR__ . '/apis/rewards.php';
 require_once __DIR__ . '/apis/bot_accounts.php';
 require_once __DIR__ . '/apis/bot_creator.php';
 require_once __DIR__ . '/apis/bot_platform.php';

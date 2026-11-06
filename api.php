@@ -217,7 +217,7 @@ try {
             FROM chats c JOIN members m ON m.chat_id = c.id LEFT JOIN messages latest ON latest.id = (SELECT MAX(id) FROM messages WHERE chat_id = c.id) WHERE m.user_id = ? ORDER BY COALESCE(latest.created_at, c.created_at) DESC, c.id DESC", [$uid, $uid, $uid])->fetchAll();
         foreach ($chats as &$c) {
             if ($c['kind'] === 'direct') {
-                $p = one('SELECT u.id, u.name, u.username, u.last_seen FROM users u JOIN members m ON m.user_id = u.id WHERE m.chat_id = ? AND u.id <> ?', [$c['id'], $uid]);
+                $p = one('SELECT u.id, u.name, u.username, u.last_seen, COALESCE(w.verified,0) AS verified FROM users u JOIN members m ON m.user_id = u.id LEFT JOIN lchat_wallets w ON w.user_id=u.id WHERE m.chat_id = ? AND u.id <> ?', [$c['id'], $uid]);
                 $c['title'] = $p['name']; $c['peer'] = user_call_flags([$p])[0];
             }
         } unset($c);

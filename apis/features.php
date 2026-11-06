@@ -123,6 +123,10 @@ function ensure_features(): void {
         upgrade_message_columns(db());
         query('UPDATE settings SET value = ? WHERE name = ?', ['17', 'schema_version']);
     }
+    if ((int)$version['value'] < 21) {
+        rewards_install();
+        query('UPDATE settings SET value = ? WHERE name = ?', ['21', 'schema_version']);
+    }
     try { bot_creator_install(); }
     catch (Throwable $e) { error_log('LChat BotCreator provision: ' . get_class($e) . ' ' . $e->getMessage()); }
     $ready = true;
