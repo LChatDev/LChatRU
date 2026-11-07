@@ -30,6 +30,7 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
+  if (/\/assets\/animated-emoji\/[^/]+\.webp$/.test(url.pathname)) return;
   if (url.origin !== self.location.origin || !url.pathname.startsWith('/assets/')) return;
   event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
     if (response.ok && response.type === 'basic') {
