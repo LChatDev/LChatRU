@@ -1,0 +1,22 @@
+/* Lightweight glass surfaces, responsive to both themes and reduced motion. */
+:root:root{--glass-surface:rgba(25,30,37,.78);--glass-edge:rgba(255,255,255,.12);--glass-shadow:0 10px 36px rgba(0,0,0,.16)}
+:root:root[data-lchat-theme="light"]{--glass-surface:rgba(255,255,255,.8);--glass-edge:rgba(255,255,255,.85);--glass-shadow:0 10px 36px rgba(42,65,91,.12)}
+@supports(backdrop-filter:blur(18px)){
+:root:root .sidebar-header,:root:root .chat-header,:root:root .composer,:root:root .call-header,:root:root .call-controls,:root:root .weba-menu,:root:root dialog,:root:root .incoming,:root:root .cookie-notice{background:var(--glass-surface)!important;backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%);border-color:var(--glass-edge)!important}
+:root:root .sidebar .mobile-nav{background:var(--glass-surface)!important;backdrop-filter:blur(24px) saturate(155%)!important;-webkit-backdrop-filter:blur(24px) saturate(155%)!important;border:1px solid var(--glass-edge)!important}
+}
+:root:root .weba-menu,:root:root dialog,:root:root .incoming,:root:root .cookie-notice{box-shadow:var(--glass-shadow)!important}
+:root:root .chat-row.selected{background:color-mix(in srgb,var(--lc-action) 24%,var(--lc-panel))!important}
+:root:root .chat-row:hover{background:color-mix(in srgb,var(--lc-action) 11%,var(--lc-panel))!important}
+@media(prefers-reduced-motion:no-preference){
+:root:root .chat-row,:root:root .quick-action,:root:root .mobile-screen-row,:root:root .mobile-nav-item,:root:root .profile-action,:root:root .icon-button,:root:root .control-button{transition:background-color .28s cubic-bezier(.2,.8,.2,1),color .28s ease,transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease!important}
+:root:root .chat-row:active,:root:root .quick-action:active,:root:root .profile-action:active,:root:root .control-button:active{transform:scale(.97)}
+:root:root .message-bubble{animation:glass-message .3s cubic-bezier(.2,.8,.2,1) both}
+:root:root dialog[open]{animation:glass-dialog .26s cubic-bezier(.2,.8,.2,1) both}
+:root:root .mobile-screen:not([hidden]){animation:glass-screen .3s cubic-bezier(.2,.8,.2,1) both}
+:root:root .incoming:not([hidden]){animation:glass-dialog .3s cubic-bezier(.2,.8,.2,1) both}
+}
+@keyframes glass-message{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes glass-dialog{from{opacity:.2;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes glass-screen{from{opacity:.2;transform:translateX(9px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){:root:root .message-bubble,:root:root dialog,:root:root .mobile-screen,:root:root .incoming{animation:none!important}}

@@ -24,7 +24,7 @@
       modal('Профиль',body=>{
         const hero=node('div','profile-hero'),photo=avatar(p.name,p.id),title=node('h2','profile-name',p.name);
         if(Number(p.verified)){const check=node('span','profile-check',' ✓');check.title='Подтверждённый аккаунт';title.append(check);}
-        const last=Date.parse(String(p.last_seen||'').replace(' ','T')+'Z');const status=chat.peer.in_call?'В звонке':Number.isFinite(last)&&Date.now()-last<45000?'В сети':'Не в сети';
+        const status=window.LChatRelativePresence?.(p.last_seen,chat.peer.in_call)||'Не был в сети';
         hero.append(photo,title,node('p','profile-status',status));body.append(hero);
         const actions=node('div','profile-actions');
         const action=(symbol,label,fn)=>{const b=button('','profile-action',fn);b.append(node('span','profile-action-icon',symbol),node('span','',label));actions.append(b);};
