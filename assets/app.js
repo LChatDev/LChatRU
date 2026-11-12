@@ -75,11 +75,20 @@ function stopChatPolling(){clearTimeout(pollTimer);clearTimeout(messageTimer);st
 function setAuth(mode){authMode=mode;const register=mode==='register';show('register-fields',register);show('login-field',!register);show('password-hint',register);$('login-tab').classList.toggle('active',!register);$('register-tab').classList.toggle('active',register);$('auth-title').textContent=register?'Давайте знакомиться':'С возвращением';$('auth-subtitle').textContent=register?'Создайте аккаунт и найдите своих людей.':'Войдите, чтобы продолжить разговор.';$('auth-submit').textContent=register?'Создать аккаунт →':'Войти →';
   const form=$('auth-form');['name','username','email'].forEach(k=>{form.elements[k].required=register;form.elements[k].disabled=!register;});form.elements.login.required=!register;form.elements.login.disabled=register;form.elements.password.autocomplete=register?'new-password':'current-password';show('auth-error',false);
 }
-on('login-tab','click',()=>setAuth('login'));on('register-tab','click',()=>setAuth('register'));
+on('login-tab','click',()=>setAuth('login'));on('register-tab','click',()=>{$('registration-success').hidden=true;setAuth('register');});
 on('show-password','click',()=>{const i=$('auth-form').elements.password;i.type=i.type==='password'?'text':'password';$('show-password').setAttribute('aria-label',i.type==='password'?'Показать пароль':'Скрыть пароль');});
 function authError(error){$('auth-error').textContent=error.message||'Не удалось войти. Повторите попытку.';show('auth-error');}
 $('auth-form').addEventListener('invalid',e=>{authError(new Error(e.target.validationMessage||'Проверьте заполнение формы.'));},true);
-on('auth-form','submit',async e=>{e.preventDefault();if(authBusy)return;authBusy=true;const mode=authMode,payload=Object.fromEntries(new FormData(e.target));$('login-tab').disabled=true;$('register-tab').disabled=true;clearTimeout(reconnectTimer);stopChatPolling();const b=$('auth-submit');b.disabled=true;show('auth-error',false);try{const before=await api('me');csrf=before.csrf;await api(mode,payload,true);const session=await api('me');if(!session.user)throw new Error('Вход не сохранился. Разрешите cookies для этого сайта. Если cookies разрешены, проверьте сохранение PHP-сессий на сервере.');csrf=session.csrf;await boot(session);e.target.reset();}catch(e){view('auth');authError(e);}finally{authBusy=false;b.disabled=false;$('login-tab').disabled=false;$('register-tab').disabled=false;}});
+on('auth-form','submit',async e=>{e.preventDefault();if(authBusy)return;authBusy=true;const mode=authMode,payload=Object.fromEntries(new FormData(e.target));$('login-tab').disabled=true;$('register-tab').disabled=true;clearTimeout(reconnectTimer);stopChatPolling();const b=$('auth-submit');b.disabled=true;show('auth-error',false);try{const before=await api('me');csrf=before.csrf;const response=await api(mode,payload,true);if(mode==='register'&&response.verification_required){
+      e.target.reset();
+      setAuth('login');
+      e.target.elements.login.value=payload.email;
+      const notice=$('registration-success');
+      notice.textContent='Мы отправили письмо. Откройте ссылку из письма и нажмите «Подтвердить почту», затем войдите. Если письма нет, проверьте папку «Спам».';
+      notice.hidden=false;
+      notice.focus();
+      return;
+    }const session=await api('me');if(!session.user)throw new Error('Вход не сохранился. Разрешите cookies для этого сайта. Если cookies разрешены, проверьте сохранение PHP-сессий на сервере.');csrf=session.csrf;await boot(session);e.target.reset();}catch(e){view('auth');authError(e);}finally{authBusy=false;b.disabled=false;$('login-tab').disabled=false;$('register-tab').disabled=false;}});
 async function boot(verifiedSession=null){
   clearTimeout(reconnectTimer);
   stopChatPolling();
