@@ -47,3 +47,8 @@
 Текст сообщения: до **10 МиБ в UTF-8**. При обновлении создайте резервную копию базы; MySQL-миграция расширяет поля сообщений и очереди ботов. Для больших запросов проверьте лимиты PHP, веб-сервера и `max_allowed_packet` MySQL (не менее 32 МиБ). Лимит вложений задаётся отдельно.
 
 Анимированные эмодзи и сведения об источнике: [EMOJI.md](EMOJI.md).
+
+
+[Codex skill / ИИ-скилл](.agents/skills/lchat-maintainer/SKILL.md). Open the repository in Codex and invoke `$lchat-maintainer`.
+
+[Fork appearance / Настройка оформления](CUSTOMIZATION.md).

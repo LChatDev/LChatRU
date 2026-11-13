@@ -1,0 +1,39 @@
+/* Optional fork appearance. Uncomment the rules you want to use.
+
+:root:root {
+  --fork-accent: #176d94;
+  --fork-sidebar: 350px;
+  --fork-message-size: 16px;
+  --fork-bubble-radius: 16px;
+  --fork-wallpaper: linear-gradient(135deg, #172235, #192d32);
+}
+
+:root:root[data-lchat-theme="light"] {
+  --fork-accent: #155775;
+  --fork-wallpaper: linear-gradient(135deg, #eff7ff, #e3f5ee);
+}
+
+:root:root :is(.primary, .send-button) {
+  background: var(--fork-accent) !important;
+  color: white !important;
+}
+
+:root:root :is(.message:not(.mine), .message.mine) .message-bubble {
+  border-radius: var(--fork-bubble-radius) !important;
+}
+
+:root:root .message-text {
+  font-size: var(--fork-message-size);
+}
+
+:root:root .conversation {
+  background: var(--fork-wallpaper) !important;
+}
+
+@media (min-width: 1001px) {
+  :root:root .messenger {
+    grid-template-columns: var(--fork-sidebar) minmax(0, 1fr) !important;
+  }
+}
+
+*/
