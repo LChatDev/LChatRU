@@ -26,9 +26,9 @@ function show(id, visible=true){$(id).hidden=!visible;}
 function randomNonce(){const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');}
 let authBusy=false;let avatarEpoch=0;let csrf='', me=null, chats=[], selected=null, messages=[], people=[], authMode='login', onlyGroups=false, publicBase='';
 let replyKeyboard=null, keyboardPending=null;
-let pollTimer, messageTimer, messageBusy=false, toastTimer, incomingCall=null;
+let pollTimer, pollGeneration=0, messageBusy=false, toastTimer, incomingCall=null;
 let syncRequest=null,syncFailures=0,syncHasMore=false,selectionVersion=0,activeCalls=[],sidebarSignature='';
-const lastReadSent=new Map();
+const lastReadSent=new Map(),pendingReads=new Map();
 let reconnectTimer=null,reconnectDelay=2500;
 const dismissed=new Set();
 const incomingSeen=new Map();let trackerUser=0,snapshotReady=false;
@@ -51,7 +51,7 @@ async function api(action,data={},post=false,retryCsrf=true){
   const options={credentials:'same-origin',cache:'no-store'};
   if(post){options.method='POST';options.headers={'Content-Type':'application/json','X-CSRF-Token':csrf};options.body=JSON.stringify(data);}
   else Object.entries(data).forEach(([k,v])=>url.searchParams.set(k,String(v)));
-  const controller=new AbortController();options.signal=controller.signal;const timeout=setTimeout(()=>controller.abort(),['message.send','message.edit','sync','messages'].includes(action)?180000:15000);
+  const controller=new AbortController();options.signal=controller.signal;const timeout=setTimeout(()=>controller.abort(),['message.send','message.edit','messages'].includes(action)?180000:15000);
   try{const res=await fetch(url,options);let value;try{value=await res.json();}catch{throw new Error('Сервер вернул неверный ответ. Проверьте PHP и установку.');}
     if(!res.ok){
       if(post&&res.status===403&&value.error==='Обновите страницу и повторите действие.'){
@@ -71,7 +71,7 @@ function dayText(raw){return new Date(raw.replace(' ','T')+'Z').toLocaleDateStri
 function linkFor(key,value){const u=new URL('index.php',publicBase||location.href);u.search='';u.hash='';if(key==='channel'){u.pathname=u.pathname.replace(/index\.php$/,'')+encodeURIComponent(value);}else u.searchParams.set(key,value);return u.href;}
 async function copy(text){try{await navigator.clipboard.writeText(text);toast('Ссылка скопирована');}catch{modal('Скопируйте ссылку',body=>{const i=node('input');i.value=text;i.readOnly=true;body.append(i);i.select();});}}
 function view(id){['loading','auth','messenger','call-page'].forEach(x=>show(x,x===id));}
-function stopChatPolling(){clearTimeout(pollTimer);clearTimeout(messageTimer);stopRinging();}
+function stopChatPolling(){clearTimeout(pollTimer);pollGeneration++;syncFailures=0;syncHasMore=false;stopRinging();}
 function setAuth(mode){authMode=mode;const register=mode==='register';show('register-fields',register);show('login-field',!register);show('password-hint',register);$('login-tab').classList.toggle('active',!register);$('register-tab').classList.toggle('active',register);$('auth-title').textContent=register?'Давайте знакомиться':'С возвращением';$('auth-subtitle').textContent=register?'Создайте аккаунт и найдите своих людей.':'Войдите, чтобы продолжить разговор.';$('auth-submit').textContent=register?'Создать аккаунт →':'Войти →';
   const form=$('auth-form');['name','username','email'].forEach(k=>{form.elements[k].required=register;form.elements[k].disabled=!register;});form.elements.login.required=!register;form.elements.login.disabled=register;form.elements.password.autocomplete=register?'new-password':'current-password';show('auth-error',false);
 }
@@ -113,13 +113,37 @@ function applyChats(data){updateAccountState(data.call_state);let hasNew=false;f
   updateCallBanner();
 }
 async function refreshChats(initial=false,reuse=false){
-  if(syncRequest){await syncRequest;if(reuse)return;return refreshChats(initial);}
-  const chatId=selected&&!messageBusy&&$('call-page').hidden?Number(selected.id):0,version=selectionVersion,user=Number(me?.id);
-  const after=initial?0:Number(messages.at(-1)?.id||0);deletionOffset=messages.length?(deletionOffset+200)%messages.length:0;
-  syncRequest=(async()=>{const data=await api('sync',chatId?{chat_id:chatId,after,edit_after:editCursor,known_ids:messages.slice(deletionOffset,deletionOffset+200).map(m=>m.id).join(',')}:{});if(Number(me?.id)!==user)return;syncFailures=0;applyChats(data);if(chatId&&selected&&Number(selected.id)===chatId&&version===selectionVersion&&data.messages){await applyMessages(data,{initial:initial||!after});}})();
+  if(syncRequest){
+    if(reuse)return syncRequest;
+    await syncRequest.catch(()=>{});
+    return refreshChats(initial);
+  }
+  const chatId=selected&&(initial||!messageBusy)&&$('call-page').hidden?Number(selected.id):0,version=selectionVersion,user=Number(me?.id);
+  const after=initial?0:Number(messages.at(-1)?.id||0);const knownIds=messages.slice(deletionOffset,deletionOffset+200).map(m=>m.id).join(',');
+  deletionOffset=deletionOffset+200<messages.length?deletionOffset+200:0;
+  syncRequest=(async()=>{const data=await api('sync',chatId?{chat_id:chatId,after,edit_after:editCursor,known_ids:knownIds}:{});if(Number(me?.id)!==user)return;syncFailures=0;applyChats(data);if(chatId&&selected&&Number(selected.id)===chatId&&version===selectionVersion&&data.messages){await applyMessages(data,{initial:initial||!after});}})();
   try{await syncRequest;}finally{syncRequest=null;}
 }
-function pollChats(delay){clearTimeout(pollTimer);if(!me)return;const interval=delay??(document.hidden?8000:rtc?4000:syncHasMore?150:Math.min(1500*Math.max(1,2**syncFailures),12000));pollTimer=setTimeout(async()=>{if(!me)return;try{await refreshChats(false,true);}catch(e){syncFailures++;connection(false);if(e.status===401){me=null;stopChatPolling();view('auth');return;}if(e.status===403)closeChat();}pollChats();},interval);}
+function pollChats(delay){
+  clearTimeout(pollTimer);
+  const generation=++pollGeneration;
+  if(!me||!$('call-page').hidden)return;
+  const interval=delay??(document.hidden?8000:rtc?4000:syncFailures?Math.min(1500*2**syncFailures,12000):syncHasMore?150:1500);
+  pollTimer=setTimeout(async()=>{
+    if(generation!==pollGeneration||!me)return;
+    const version=selectionVersion;
+    try{
+      await refreshChats(false,true);
+    }catch(e){
+      if(generation!==pollGeneration)return;
+      syncFailures++;
+      connection(false);
+      if(e.status===401){me=null;stopChatPolling();view('auth');return;}
+      if(e.status===403&&version===selectionVersion)closeChat();
+    }
+    if(generation===pollGeneration)pollChats();
+  },interval);
+}
 function updateCallBanner(){const call=selected?.kind==='group'?activeCalls.find(c=>Number(c.chat_id)===Number(selected.id)):null;show('group-call-banner',!!call);if(call){$('group-call-count').textContent=`Участников: ${call.participants}`;$('group-call-join').dataset.token=call.token;}document.querySelectorAll('.system-join').forEach(b=>b.hidden=!activeCalls.some(c=>c.token===b.dataset.token));}
 on('group-call-join','click',()=>navigateCall($('group-call-join').dataset.token));
 function renderChats(){const list=$('chat-list');list.replaceChildren();$('chat-count').textContent=chats.length;const term=$('chat-filter').value.toLowerCase();const filtered=chats.filter(c=>(!channelOnly||c.kind==='channel')&&(!onlyGroups||c.kind==='group')&&c.title.toLowerCase().includes(term));
@@ -130,7 +154,7 @@ on('chat-filter','input',renderChats);on('filter-all','click',()=>{onlyGroups=fa
 function relativePresence(value,inCall=false){if(inCall)return 'В звонке';const raw=String(value||'').trim();if(!raw)return 'Не был в сети';const time=Date.parse(raw.replace(' ','T')+(raw.includes('Z')||/[+-]\d\d:?\d\d$/.test(raw)?'':'Z'));if(!Number.isFinite(time))return 'Не был в сети';const minutes=Math.max(0,Math.floor((Date.now()-time)/60000));if(minutes<1)return 'в сети';if(minutes<60)return `был ${minutes} ${minutes%10===1&&minutes%100!==11?'минуту':minutes%10>=2&&minutes%10<=4&&(minutes%100<12||minutes%100>14)?'минуты':'минут'} назад`;const hours=Math.floor(minutes/60);if(hours<24)return `был ${hours} ${hours%10===1&&hours%100!==11?'час':hours%10>=2&&hours%10<=4&&(hours%100<12||hours%100>14)?'часа':'часов'} назад`;const days=Math.floor(hours/24);if(days===1)return 'был вчера';if(days<7)return `был ${days} ${days>=2&&days<=4?'дня':'дней'} назад`;return 'был '+new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long'}).format(new Date(time));}
 window.LChatRelativePresence=relativePresence;
 function updateHeading(){if(!selected)return;const channel=selected.kind==='channel';show('composer',!channel||selected.role==='owner');show('audio-call',!channel);show('video-call',!channel);if(channel){const a=avatar(selected.title,selected.id,true);a.id='chat-avatar';$('chat-avatar').replaceWith(a);$('chat-title').textContent='📢 '+selected.title;$('chat-subtitle').textContent=selected.member_count+' подписчиков · @'+selected.channel_slug;return;}$('chat-title').textContent=selected.title;if(Number(selected.peer?.verified)){const check=node('span','verified-badge',' ✓');check.title='Verified';$('chat-title').append(check);}const a=avatar(selected.title,selected.kind==='group'?selected.id:selected.peer?.id,selected.kind==='group');a.id='chat-avatar';$('chat-avatar').replaceWith(a);$('chat-subtitle').textContent=selected.kind==='group'?`${selected.member_count} участников`:`@${selected.peer?.username||''} · ${relativePresence(selected.peer?.last_seen,selected.peer?.in_call)}`;}
-async function selectChat(chat){if(!chat)return;closeMessageMenu();clearReply();editCursor=0;deletionOffset=0;if(selected?.id!==chat.id)discardVoice();selectionVersion++;selected=chat;messages=[];people=[];replyKeyboard=null;keyboardPending=null;renderReplyKeyboard();show('empty-chat',false);show('active-chat');$('messenger').classList.add('chat-open');$('message-input').value='';$('message-input').style.height='auto';$('message-items').replaceChildren();show('older-messages',false);updateHeading();renderChats();updateCallBanner();await loadMessages(false,true);pollChats();if(innerWidth>760)$('message-input').focus();}
+async function selectChat(chat){if(!chat)return;closeMessageMenu();clearReply();editCursor=0;deletionOffset=0;if(selected?.id!==chat.id)discardVoice();selectionVersion++;selected=chat;messages=[];people=[];replyKeyboard=null;keyboardPending=null;renderReplyKeyboard();show('empty-chat',false);show('active-chat');$('messenger').classList.add('chat-open');$('message-input').value='';$('message-input').style.height='auto';$('message-items').replaceChildren();show('older-messages',false);updateHeading();renderChats();updateCallBanner();await loadMessages(false,true);if(innerWidth>760&&selected?.id===chat.id)$('message-input').focus();}
 function closeChat(){closeMessageMenu();clearReply();discardVoice();selectionVersion++;selected=null;messages=[];replyKeyboard=null;renderReplyKeyboard();show('group-call-banner',false);show('active-chat',false);show('empty-chat');$('messenger').classList.remove('chat-open');renderChats();}
 on('mobile-back','click',closeChat);
 function mergeMessages(rows){const m=new Map(messages.map(x=>[Number(x.id),x]));rows.forEach(x=>m.set(Number(x.id),x));messages=[...m.values()].sort((a,b)=>Number(a.id)-Number(b.id));}
@@ -141,9 +165,24 @@ async function applyMessages(data,{initial=false,older=false}={}){const box=$('m
   for(const state of data.reaction_state||[]){const changed=messages.find(m=>Number(m.id)===Number(state.message_id));if(changed&&JSON.stringify(changed.reactions||[])!==JSON.stringify(state.reactions||[])){changed.reactions=state.reactions||[];if(!initial&&!older&&known.has(Number(changed.id)))replaceMessageRow(changed);}}
   if(initial||older)renderMessages();else if(additions.length)appendMessages(additions);updateReceipts();updateCallBanner();
   if(initial||older)show('older-messages',!!data.has_more);if(older)box.scrollTop=oldTop+box.scrollHeight-oldHeight;else if(initial||atBottom)box.scrollTop=box.scrollHeight;else box.scrollTop=oldTop;
-  if(!document.hidden&&$('call-page').hidden&&messages.length)await markRead();syncHasMore=!!data.has_more&&!initial&&!older;
+  if(!older)syncHasMore=!!data.has_more&&!initial;
+  if(!document.hidden&&$('call-page').hidden&&messages.length)markRead().catch(()=>{});
 }
-async function markRead(){if(!selected||!messages.length)return;const id=Number(selected.id),last=Number(messages.at(-1).id);if((lastReadSent.get(id)||0)>=last)return;await api('chat.read',{chat_id:id,last_id:last},true);lastReadSent.set(id,last);if(Number(selected?.id)===id){selected.unread=0;renderChats();}}
+async function markRead(){
+  if(!me||!selected||!messages.length)return;
+  const id=Number(selected.id),last=Number(messages.at(-1).id),user=me;
+  if((lastReadSent.get(id)||0)>=last||pendingReads.has(id))return;
+  const read=api('chat.read',{chat_id:id,last_id:last},true);
+  pendingReads.set(id,read);
+  try{
+    await read;
+    if(Number(me?.id)!==Number(user.id))return;
+    lastReadSent.set(id,last);
+    if(Number(selected?.id)===id&&Number(messages.at(-1)?.id)===last){selected.unread=0;renderChats();}
+  }finally{
+    if(pendingReads.get(id)===read)pendingReads.delete(id);
+  }
+}
 function renderMessage(m){if(m.event_kind==='call_started'){const row=node('div','system-message');row.dataset.messageId=m.id;const label=node('span','','Звонок начался');label.prepend(icon('phone'));const join=button('Присоединиться','system-join',()=>navigateCall(m.event_token));join.dataset.token=m.event_token;row.append(label,join);return row;}
   const mine=Number(m.user_id)===Number(me.id);const row=node('div','message'+(mine?' mine':''));row.dataset.messageId=m.id;row.tabIndex=0;if(!mine&&selected.kind==='group')row.append(avatar(m.name,m.user_id));const bubble=node('div','message-bubble');if(!mine&&selected.kind==='group')bubble.append(node('div','message-author',m.name));
   if(m.reply_to_id){const quote=node('div','message-reply');quote.append(node('b','',m.reply_name||'Удалённое сообщение'),node('span','',m.reply_body||'Сообщение удалено'));bubble.append(quote);}
@@ -307,7 +346,10 @@ async function leaveCall(notify=true){const s=rtc;if(s){s.stopping=true;clearTim
 on('leave-call','click',()=>leaveCall());on('end-call','click',async()=>{if(rtc)await api('room.end',{token:rtc.token},true);await leaveCall(false);});
 window.addEventListener('pagehide',()=>{stopPreview();if(rtc){const url=new URL('api.php?action=room.leave',location.href);fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({token:rtc.token,id:rtc.id}),keepalive:true}).catch(()=>{});rtc.stream.getTracks().forEach(t=>t.stop());rtc.screen?.getTracks().forEach(t=>t.stop());}});
 window.addEventListener('popstate',async()=>{try{if(rtc)await leaveCall();else{stopPreview();await boot();}}catch(e){report(e);}});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&me){refreshChats(false,true).catch(()=>{});pollChats();}});
+function resumeChatPolling(){if(me&&!document.hidden&&$('call-page').hidden)pollChats(0);}
+document.addEventListener('visibilitychange',resumeChatPolling);
+window.addEventListener('online',resumeChatPolling);
+window.addEventListener('pageshow',event=>{if(event.persisted)resumeChatPolling();});
 let pendingUpload=null,uploadBusy=false;
 on('attach-file','click',()=>{if(selected&&!uploadBusy)$('file-input').click();});
 on('file-input','change',async()=>{const input=$('file-input'),file=input.files?.[0];if(!file||!selected||uploadBusy)return;if(file.size>8*1024*1024){input.value='';throw new Error('Файл должен быть не больше 8 МБ.');}const chatId=selected.id,body=$('message-input').value.trim();if(!pendingUpload||pendingUpload.file!==file||pendingUpload.chatId!==chatId)pendingUpload={file,chatId,nonce:randomNonce()};uploadBusy=true;$('attach-file').disabled=true;const data=new FormData();data.set('file',file);data.set('chat_id',chatId);data.set('nonce',pendingUpload.nonce);data.set('body',body);toast('Загружаем файл…');try{const response=await fetch('upload.php',{method:'POST',credentials:'same-origin',headers:{'X-CSRF-Token':csrf},body:data});const result=await response.json();if(!response.ok)throw new Error(result.error||'Ошибка загрузки');pendingUpload=null;input.value='';if(selected?.id===chatId&&$('message-input').value.trim()===body)$('message-input').value='';await refreshChats();if(selected?.id===chatId)await loadMessages();toast('Файл отправлен');}finally{uploadBusy=false;$('attach-file').disabled=false;}});
