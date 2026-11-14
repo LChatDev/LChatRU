@@ -19,6 +19,12 @@ Bot API работает на том же PHP-хостинге, что и сай
 | `getMe` | GET | — | Данные бота |
 | `getUpdates` | GET | `offset` (с 0), `limit` (1–100) | Очередь сообщений и нажатий; следующий offset = последний `update_id + 1` |
 | `getChat` | GET | `chat_id` | Чат, доступный боту |
+| `getChats` | GET | `after, limit` | Список чатов бота. Для следующей страницы передайте последний ID в after. |
+| `getChatMemberCount` | GET | `chat_id` | Число участников. |
+| `getChatMember` | GET | `chat_id, user_id` | Данные и роль участника. |
+| `getMessage` | GET | `chat_id, message_id` | Прочитать сообщение после вступления бота. |
+| `setMessageReaction` | POST | `chat_id, message_id, emoji` | Поставить 👍 ❤️ 😂 😮 😢 или 👏. Значение null убирает реакцию. |
+| `editMessageCaption` | POST | `chat_id, message_id, caption` | Изменить подпись к медиа бота. До 1024 символов. Пустая строка очищает подпись. |
 | `setWebhook` / `deleteWebhook` | POST | `url`, необязательные `secret_token`, `drop_pending_updates` | Включить или отключить HTTPS-вебхук |
 | `getWebhookInfo` | GET | — | Адрес, число ожидающих событий и последняя ошибка |
 | `sendMessage` | POST | `chat_id`, `text`, необязательные `reply_to_message_id`, `reply_markup` | Отправленное сообщение, inline-кнопки или обычная клавиатура |
@@ -50,3 +56,11 @@ curl -X POST -H "Authorization: Bearer ВАШ_ТОКЕН" -H "Content-Type: appl
 ```
 
 `chat_id` берите из `message.chat.id` ответа `getUpdates` или результата `getChat`. Запускайте опрос с паузой между запросами и сохраняйте последний offset на стороне своего бота.
+
+### Прочитать сообщение и поставить реакцию
+
+```text
+GET /bot-api.php?method=getMessage&chat_id=123&message_id=456
+POST /bot-api.php?method=setMessageReaction
+{"chat_id":123,"message_id":456,"emoji":"👍"}
+```
