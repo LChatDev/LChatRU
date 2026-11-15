@@ -1,0 +1,105 @@
+@media (max-width: 760px) {
+  #messenger {
+    --mobile-dock-height: calc(60px + env(safe-area-inset-bottom, 0px));
+    --mobile-bottom-inset: env(safe-area-inset-bottom, 0px);
+    height: 100vh;
+    height: var(--mobile-viewport-height, 100dvh);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  #messenger.mobile-keyboard { --mobile-bottom-inset: 0px; }
+  #messenger > .sidebar { padding-top: env(safe-area-inset-top, 0px); }
+  #messenger .chat-header { margin-top: env(safe-area-inset-top, 0px); }
+  #messenger .chat-header #mobile-back { flex: 0 0 44px; width: 44px; height: 44px; }
+  #messenger .chat-list .chat-row { height: 64px; min-height: 64px; padding: 6px 10px; gap: 10px; }
+  #messenger .chat-list .chat-row .avatar { width: 46px; height: 46px; }
+  #messenger #messages { min-height: 0; }
+  #messenger #composer { margin-bottom: max(8px, var(--mobile-bottom-inset)); }
+  #messenger :is(#message-input, .lce-editor) { min-width: 0; max-height: min(130px, 26dvh); }
+
+  :root:root #messenger > .sidebar .mobile-nav {
+    position: relative;
+    inset: auto;
+    flex: 0 0 var(--mobile-dock-height);
+    box-sizing: border-box;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    padding: 2px 6px calc(2px + env(safe-area-inset-bottom, 0px));
+    border-radius: 0;
+  }
+
+  #messenger .mobile-nav-item {
+    height: auto;
+    position: relative;
+    isolation: isolate;
+    color: var(--tg-text, var(--wa-text, #d8e0ed)) !important;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: color .16s ease, transform .16s ease;
+  }
+
+  #messenger .mobile-nav-item::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 3px 4px;
+    border-radius: 18px;
+    background: currentColor;
+    opacity: 0;
+    transform: scale(.86);
+    transition: opacity .18s ease, transform .24s cubic-bezier(.2,.75,.3,1);
+  }
+
+  #messenger .mobile-nav-item.active { color: var(--tg-accent, var(--wa-accent, #6ab3f3)) !important; }
+  #messenger .mobile-nav-item.active::before { opacity: .14; transform: scale(1); }
+  #messenger .mobile-nav-item:active { transform: scale(.94); }
+  :root:root #messenger > .sidebar:has(.mobile-nav) .chat-list { padding-bottom: 66px !important; }
+  :root:root #messenger > .sidebar:has(.mobile-nav) > #new-chat { bottom: calc(var(--mobile-dock-height) + 12px) !important; }
+
+  #messenger .mobile-screen:not([hidden]) {
+    bottom: var(--mobile-dock-height);
+    padding: 0 12px 12px;
+    scrollbar-width: thin;
+  }
+
+  #messenger .mobile-screen-heading {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 44px minmax(0,1fr) 44px;
+    align-items: center;
+    min-height: 54px;
+    margin: 0 -12px 8px;
+    padding: env(safe-area-inset-top, 0px) 10px 0;
+    background: var(--tg-bg, #101a25);
+  }
+
+  #messenger .mobile-screen-title { position: static; margin: 0; padding: 0; }
+  #messenger .mobile-screen-back { display: grid; place-items: center; width: 44px; height: 44px; color: inherit; }
+  #messenger .mobile-screen-back svg { width: 22px; height: 22px; }
+  #messenger .mobile-row-icon svg { width: 21px; height: 21px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    #messenger.chat-open #active-chat:not([hidden]) { animation: lchat-mobile-open .23s cubic-bezier(.2,.75,.3,1) both; }
+    #messenger.mobile-returning:not(.chat-open) > .sidebar { animation: lchat-mobile-return .20s ease-out both; }
+    #messenger .mobile-screen-enter { animation: lchat-mobile-open .20s ease-out both; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #messenger .mobile-nav-item,
+    #messenger .mobile-nav-item::before { transition: none; }
+  }
+}
+
+@keyframes lchat-mobile-open {
+  from { opacity: .65; translate: 14px 0; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes lchat-mobile-return {
+  from { opacity: .75; translate: -10px 0; }
+  to { opacity: 1; translate: 0 0; }
+}
