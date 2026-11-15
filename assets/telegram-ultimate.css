@@ -1,0 +1,686 @@
+/* LChat · финальный слой Telegram Web A.
+   Грузить ПОСЛЕ minimal / gui-pro-max / lchatai-*. Перебивает glass и minimal. */
+
+:root:root,
+:root:root[data-lchat-theme="dark"] {
+  color-scheme: dark;
+  --tg-bg: #0e1621;
+  --tg-panel: #17212b;
+  --tg-raised: #242f3d;
+  --tg-hover: #202b36;
+  --tg-active: #2b5278;
+  --tg-text: #f5f7fa;
+  --tg-muted: #708499;
+  --tg-accent: #6ab3f3;
+  --tg-accent-strong: #5288c1;
+  --tg-in: #182533;
+  --tg-out: #2b5278;
+  --tg-pattern: .14;
+  --wa-surface: var(--tg-panel);
+  --wa-bg: var(--tg-bg);
+  --wa-hover: var(--tg-hover);
+  --wa-active: var(--tg-active);
+  --wa-accent: var(--tg-accent);
+  --wa-text: var(--tg-text);
+  --wa-muted: var(--tg-muted);
+  --wa-border: #0e162180;
+  --wa-in: var(--tg-in);
+  --wa-out: var(--tg-out);
+  --wa-menu: #17212bf2;
+  --lc-bg: var(--tg-bg);
+  --lc-panel: var(--tg-panel);
+  --lc-raised: var(--tg-raised);
+  --lc-hover: var(--tg-hover);
+  --lc-ink: var(--tg-text);
+  --lc-muted: var(--tg-muted);
+  --lc-line: #0e162180;
+  --lc-accent: var(--tg-accent);
+  --lc-action: var(--tg-accent-strong);
+  --lc-in: var(--tg-in);
+  --lc-out: var(--tg-out);
+  --glass-surface: var(--tg-panel);
+  --glass-edge: transparent;
+  --glass-shadow: none;
+}
+
+/* Desktop Web A: фиолетовый акцент как в telegram-tt dark */
+@media (min-width: 761px) {
+  :root:root,
+  :root:root[data-lchat-theme="dark"] {
+    --tg-bg: #0f0f0f;
+    --tg-panel: #212121;
+    --tg-raised: #2c2c2c;
+    --tg-hover: #2c2c2c;
+    --tg-active: #766ac8;
+    --tg-text: #fff;
+    --tg-muted: #aaaaaa;
+    --tg-accent: #8774e1;
+    --tg-accent-strong: #8774e1;
+    --tg-in: #212121;
+    --tg-out: #766ac8;
+    --tg-pattern: .18;
+    --wa-border: #ffffff14;
+    --lc-line: #ffffff14;
+  }
+}
+
+:root:root[data-lchat-theme="light"] {
+  color-scheme: light;
+  --tg-bg: #dce7d7;
+  --tg-panel: #ffffff;
+  --tg-raised: #f4f4f5;
+  --tg-hover: #f4f4f5;
+  --tg-active: #3390ec;
+  --tg-text: #000000;
+  --tg-muted: #707579;
+  --tg-accent: #3390ec;
+  --tg-accent-strong: #3390ec;
+  --tg-in: #ffffff;
+  --tg-out: #eeffde;
+  --tg-pattern: .10;
+  --wa-surface: var(--tg-panel);
+  --wa-bg: var(--tg-bg);
+  --wa-hover: var(--tg-hover);
+  --wa-active: var(--tg-active);
+  --wa-accent: var(--tg-accent);
+  --wa-text: var(--tg-text);
+  --wa-muted: var(--tg-muted);
+  --wa-border: #00000014;
+  --wa-in: var(--tg-in);
+  --wa-out: var(--tg-out);
+  --wa-menu: #fffffff2;
+  --lc-bg: #ffffff;
+  --lc-panel: var(--tg-panel);
+  --lc-raised: var(--tg-raised);
+  --lc-hover: #e7f1f9;
+  --lc-ink: var(--tg-text);
+  --lc-muted: var(--tg-muted);
+  --lc-line: #00000014;
+  --lc-accent: var(--tg-accent);
+  --lc-action: var(--tg-accent);
+  --lc-in: var(--tg-in);
+  --lc-out: var(--tg-out);
+  --glass-surface: var(--tg-panel);
+  --glass-edge: transparent;
+  --glass-shadow: none;
+}
+
+html, body,
+:root:root button,
+:root:root input,
+:root:root textarea,
+:root:root select {
+  font-family: Roboto, "Segoe UI", Arial, sans-serif !important;
+}
+
+:root:root body,
+:root:root .messenger,
+:root:root .loading {
+  background: var(--tg-bg) !important;
+  color: var(--tg-text) !important;
+}
+
+:root:root .messenger {
+  grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+}
+
+/* ——— Sidebar (Web A: меню + поиск, без заголовка LChat) ——— */
+:root:root .sidebar {
+  background: var(--tg-panel) !important;
+  border-right: 1px solid var(--wa-border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root:root .sidebar-header {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: 10px;
+  height: 64px !important;
+  min-height: 64px !important;
+  margin: 0 !important;
+  padding: 8px 13px !important;
+  background: var(--tg-panel) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root:root .sidebar-header h1,
+:root:root .sidebar-header #profile-button,
+:root:root .sidebar-actions {
+  display: none !important;
+}
+
+:root:root .sidebar-header #main-menu {
+  order: 0;
+  margin-left: 0 !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--tg-muted);
+}
+
+:root:root .sidebar-header .search-box {
+  order: 1;
+  flex: 1 1 auto !important;
+  width: auto !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  margin: 0 !important;
+  padding: 0 15px !important;
+  border: 2px solid transparent !important;
+  border-radius: 24px !important;
+  background: var(--tg-raised) !important;
+  color: var(--tg-muted);
+  box-shadow: none !important;
+}
+
+:root:root .sidebar-header .search-box:focus-within {
+  border-color: var(--tg-accent) !important;
+  background: var(--tg-panel) !important;
+  color: var(--tg-accent);
+}
+
+:root:root .sidebar-header .search-box input {
+  color: var(--tg-text) !important;
+  font-size: 15px;
+}
+
+:root:root .sidebar-tabs {
+  height: 48px;
+  margin: 0 8px;
+  padding: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--wa-border) !important;
+  background: transparent !important;
+}
+
+:root:root .sidebar-tabs button {
+  min-height: 48px;
+  color: var(--tg-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+:root:root .sidebar-tabs button.active {
+  color: var(--tg-accent) !important;
+}
+
+:root:root .sidebar-tabs:after {
+  height: 3px !important;
+  background: var(--tg-accent) !important;
+}
+
+:root:root .chat-list {
+  padding: 4px 8px 82px;
+  background: var(--tg-panel) !important;
+}
+
+:root:root .chat-row {
+  height: 72px;
+  min-height: 72px;
+  margin: 0 !important;
+  padding: 8px 10px;
+  border: 0 !important;
+  border-radius: 10px !important;
+  color: var(--tg-text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+:root:root .chat-row:hover {
+  background: var(--tg-hover) !important;
+}
+
+:root:root .chat-row.selected {
+  background: var(--tg-active) !important;
+  box-shadow: none !important;
+}
+
+:root:root .chat-row.selected .chat-row-preview,
+:root:root .chat-row.selected .chat-row-time {
+  color: #ffffffb8 !important;
+}
+
+:root:root .chat-row-name {
+  color: var(--tg-text) !important;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+:root:root .chat-row-preview {
+  color: var(--tg-muted) !important;
+  font-size: 14px;
+}
+
+:root:root .chat-row-time {
+  color: var(--tg-muted) !important;
+  font-size: 11px;
+}
+
+:root:root .chat-row .avatar {
+  width: 54px;
+  height: 54px;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+:root:root .avatar.violet { background: #a778d0 !important; color: #fff !important; }
+:root:root .avatar.mint { background: #5eae8b !important; color: #fff !important; }
+:root:root .avatar.peach { background: #d98970 !important; color: #fff !important; }
+:root:root .avatar.blue,
+:root:root .avatar.group { background: #4a99de !important; color: #fff !important; }
+
+:root:root .unread {
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  background: var(--tg-accent) !important;
+  color: #fff !important;
+}
+
+:root:root .chat-row.selected .unread {
+  background: #fff !important;
+  color: var(--tg-active) !important;
+}
+
+:root:root .sidebar > #new-chat {
+  right: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--tg-accent) !important;
+  border-color: var(--tg-accent) !important;
+  color: #fff !important;
+  box-shadow: 0 5px 16px #0005 !important;
+}
+
+/* ——— Conversation ——— */
+:root:root .conversation {
+  background: var(--tg-bg) !important;
+  background-image: none !important;
+}
+
+:root:root .conversation:before {
+  content: "" !important;
+  display: block !important;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: url('weba-pattern.svg') center / 580px auto repeat !important;
+  opacity: var(--tg-pattern) !important;
+  pointer-events: none;
+  filter: brightness(.75);
+}
+
+:root:root[data-lchat-theme="light"] .conversation:before {
+  filter: none;
+}
+
+:root:root .chat-header {
+  height: 64px !important;
+  min-height: 64px !important;
+  margin: 0;
+  padding: 8px 19px;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  border-radius: 0;
+  background: var(--tg-panel) !important;
+  box-shadow: 0 1px 4px #0003 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root:root .chat-heading h2 {
+  color: var(--tg-text) !important;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+:root:root .chat-heading span {
+  color: var(--tg-muted) !important;
+  font-size: 13px;
+}
+
+:root:root .message-bubble {
+  min-width: 76px;
+  max-width: min(85%, 29rem);
+  padding: 6px 10px !important;
+  border: 0 !important;
+  border-radius: 15px 15px 15px 6px !important;
+  background: var(--tg-in) !important;
+  color: var(--tg-text) !important;
+  box-shadow: 0 1px 2px #0004 !important;
+}
+
+:root:root .message.mine .message-bubble {
+  background: var(--tg-out) !important;
+  border-radius: 15px 15px 6px 15px !important;
+}
+
+:root:root .message-text,
+:root:root .message.mine .message-text {
+  color: var(--tg-text) !important;
+}
+
+:root:root[data-lchat-theme="light"] .message.mine .message-text {
+  color: #000 !important;
+}
+
+:root:root .message-time {
+  color: var(--tg-muted) !important;
+}
+
+:root:root .message.mine .message-time {
+  color: #ffffff99 !important;
+}
+
+:root:root[data-lchat-theme="light"] .message.mine .message-time {
+  color: #4d7a4a !important;
+}
+
+:root:root .message-date {
+  background: #00000055 !important;
+  color: #fff !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+:root:root .composer {
+  background: var(--tg-panel) !important;
+  color: var(--tg-text) !important;
+  border: 0 !important;
+  border-radius: 24px !important;
+  box-shadow: 0 1px 5px #0004 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root:root .composer:focus-within {
+  border-color: transparent !important;
+}
+
+:root:root .composer .lce-editor,
+:root:root .composer textarea {
+  color: var(--tg-text) !important;
+}
+
+:root:root .composer .lce-editor[data-empty="true"]::before,
+:root:root .composer textarea::placeholder {
+  color: var(--tg-muted);
+}
+
+:root:root .primary,
+:root:root .send-button,
+:root:root .composer #voice-record {
+  background: var(--tg-accent) !important;
+  border-color: var(--tg-accent) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+:root:root .primary:hover,
+:root:root .send-button:hover,
+:root:root .composer #voice-record:hover {
+  background: var(--tg-accent-strong) !important;
+  filter: brightness(1.05);
+}
+
+:root:root .icon-button {
+  color: var(--tg-muted);
+}
+
+:root:root .icon-button:hover {
+  background: var(--tg-hover) !important;
+  color: var(--tg-text) !important;
+}
+
+:root:root .weba-menu,
+:root:root dialog {
+  background: var(--tg-panel) !important;
+  color: var(--tg-text) !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 28px #0006 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root:root .weba-menu button:hover,
+:root:root .weba-menu a:hover {
+  background: var(--tg-hover) !important;
+}
+
+:root:root .brand-mark {
+  background: var(--tg-accent) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+/* Auth */
+:root:root .auth-layout {
+  background: var(--tg-panel) !important;
+}
+
+:root:root .auth-box {
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+:root:root .auth-box input:not([type="checkbox"]) {
+  background: transparent !important;
+  color: var(--tg-text) !important;
+  border-color: #666 !important;
+}
+
+:root:root .auth-box input:focus {
+  border-color: var(--tg-accent) !important;
+}
+
+:root:root .auth-box .tabs button.active,
+:root:root .forgot-link a,
+:root:root .auth-bottom a {
+  color: var(--tg-accent) !important;
+}
+
+/* Kill glass from redesign */
+@supports (backdrop-filter: blur(18px)) {
+  :root:root .sidebar-header,
+  :root:root .chat-header,
+  :root:root .composer,
+  :root:root .call-header,
+  :root:root .call-controls,
+  :root:root .weba-menu,
+  :root:root dialog,
+  :root:root .incoming,
+  :root:root .cookie-notice,
+  :root:root .sidebar .mobile-nav {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+:root:root .sidebar-header,
+:root:root .chat-header,
+:root:root .composer,
+:root:root .sidebar .mobile-nav {
+  background: var(--tg-panel) !important;
+}
+
+:root:root .cookie-notice {
+  background: var(--tg-panel) !important;
+  border: 1px solid var(--wa-border) !important;
+  color: var(--tg-text);
+  box-shadow: 0 8px 28px #0005 !important;
+}
+
+:root:root .cookie-notice button {
+  background: var(--tg-accent) !important;
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--tg-accent) 70%, #fff) !important;
+  outline-offset: 2px;
+}
+
+/* ——— Mobile: Telegram Android-like blue ——— */
+@media (max-width: 760px) {
+  :root:root,
+  :root:root[data-lchat-theme="dark"] {
+    --tg-bg: #0e1621;
+    --tg-panel: #17212b;
+    --tg-raised: #242f3d;
+    --tg-hover: #202b36;
+    --tg-active: #253956;
+    --tg-accent: #6ab3f3;
+    --tg-accent-strong: #5288c1;
+    --tg-in: #182533;
+    --tg-out: #2b5278;
+    --tg-muted: #708499;
+  }
+
+  :root:root .messenger {
+    grid-template-columns: 1fr;
+  }
+
+  :root:root .sidebar,
+  :root:root .sidebar-header {
+    background: var(--tg-panel) !important;
+  }
+
+  :root:root .sidebar-header {
+    height: auto !important;
+    min-height: 56px !important;
+    padding: 6px 10px !important;
+  }
+
+  :root:root .sidebar-header h1 {
+    display: none !important;
+  }
+
+  :root:root .sidebar-header .search-box {
+    height: 42px !important;
+    min-height: 42px !important;
+    border-radius: 22px !important;
+    background: var(--tg-raised) !important;
+  }
+
+  :root:root .sidebar-quick {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 2px 8px 6px !important;
+    gap: 2px;
+    background: transparent !important;
+  }
+
+  :root:root .quick-action {
+    background: transparent !important;
+    color: var(--tg-muted) !important;
+    border: 0 !important;
+    border-radius: 10px;
+    font-size: 10px;
+  }
+
+  :root:root .quick-action:active {
+    background: var(--tg-hover) !important;
+  }
+
+  :root:root .chat-row:hover {
+    background: var(--tg-hover) !important;
+  }
+
+  :root:root .chat-row.selected {
+    background: var(--tg-active) !important;
+  }
+
+  :root:root .sidebar .chat-list {
+    padding-bottom: calc(90px + env(safe-area-inset-bottom)) !important;
+  }
+
+  :root:root .sidebar > #new-chat {
+    bottom: calc(82px + env(safe-area-inset-bottom)) !important;
+    background: var(--tg-accent) !important;
+    border-color: var(--tg-accent) !important;
+  }
+
+  :root:root .sidebar .mobile-nav {
+    left: 0;
+    bottom: 0;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    padding: 4px 6px max(4px, env(safe-area-inset-bottom));
+    border: 0 !important;
+    border-top: 1px solid #0a121c !important;
+    border-radius: 0;
+    background: var(--tg-panel) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  :root:root .mobile-nav-item {
+    color: var(--tg-muted) !important;
+    border-radius: 10px;
+  }
+
+  :root:root .mobile-nav-item.active {
+    color: var(--tg-accent) !important;
+    background: transparent !important;
+  }
+
+  :root:root .sidebar .mobile-screen:not([hidden]) {
+    background: var(--tg-bg) !important;
+    color: var(--tg-text) !important;
+  }
+
+  :root:root .mobile-screen-title {
+    background: transparent !important;
+    color: var(--tg-text) !important;
+  }
+
+  :root:root .mobile-screen-card {
+    background: var(--tg-panel) !important;
+    border-radius: 12px;
+  }
+
+  :root:root .mobile-screen-row {
+    color: var(--tg-text) !important;
+  }
+
+  :root:root .composer {
+    width: calc(100% - 16px);
+    margin: 0 8px max(8px, env(safe-area-inset-bottom));
+    border-radius: 22px !important;
+  }
+
+  :root:root .chat-header {
+    height: 56px !important;
+    min-height: 56px !important;
+    padding: 6px 12px;
+  }
+
+  :root:root .auth-layout {
+    background: var(--tg-bg) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
