@@ -8,17 +8,19 @@ $siteName = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $siteInitial = htmlspecialchars(function_exists('mb_substr') ? mb_substr($name, 0, 1, 'UTF-8') : substr($name, 0, 1), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 ?>
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-pixel-theme>
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0b1018"><meta name="description" content="LChat — личные и групповые чаты, голосовые и видеозвонки.">
-  <title><?= $siteName ?> — ближе друг к другу</title><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="manifest" href="manifest.webmanifest">
+  <title><?= $siteName ?> — ближе друг к другу</title><link rel="icon" href="assets/pixel-icon.png" type="image/png"><link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/style.css?v=20261026-login2"><script src="assets/app.js?v=20261115-video-preview1" defer></script><script src="assets/settings.js?v=20261026-modules1" defer></script><script src="assets/bots.js?v=20261026-botcreator1" defer></script><script src="assets/weba-ui.js?v=20261029-weba2" defer></script><script src="assets/gift-instance.js?v=20261106-unique1" defer></script><link rel="stylesheet" href="assets/gift-instance.css?v=20261106-unique1"><script src="assets/user-profile.js?v=20261111-presence1" defer></script><link rel="stylesheet" href="assets/user-profile.css?v=20261106-profile3">
 <link id="dark-theme-style" rel="stylesheet" href="assets/theme.css?v=20261013-glass1"><link id="dark-details-style" rel="stylesheet" href="assets/details.css?v=20261014-path1"><link rel="stylesheet" href="assets/settings.css?v=20261026-settings1"><link rel="stylesheet" href="assets/message-extra.css?v=20261115-video-preview1"><link rel="stylesheet" href="assets/bots.css?v=20261026-bots1"><link rel="stylesheet" href="assets/aurora.css?v=20261026-replykb1"><link rel="stylesheet" href="assets/weba.css?v=20261029-weba2"><link rel="stylesheet" href="assets/community.css?v=20261030-community1"><script defer src="assets/community.js?v=20261030-community1"></script><link rel="stylesheet" href="assets/animated-emoji.css?v=20261107-5"><script defer src="assets/animated-emoji.js?v=20261107-5"></script><link rel="stylesheet" href="assets/glass-presence.css?v=20261111-1"><link rel="stylesheet" href="assets/telegram-ultimate.css?v=20261115-tg1"><link rel="stylesheet" href="assets/custom.css">
   <link rel="stylesheet" href="assets/mobile-nav.css?v=20261115-mobile1">
   <link rel="stylesheet" href="assets/mobile-shell.css?v=20261115-mobile1">
   <script src="assets/mobile-nav.js?v=20261115-mobile1" data-edition="community" defer></script>
   <script src="assets/mobile-shell.js?v=20261115-mobile1" defer></script>
+  <link rel="stylesheet" href="assets/pixel-theme.css?v=20261115-pixel1">
+  <script src="assets/pixel-theme.js?v=20261115-pixel1" defer></script>
 </head>
 <body>
   <div id="loading" class="loading"><span class="brand-mark"><?= $siteInitial ?></span><p>Подключаемся к <?= $siteName ?>…</p></div>
