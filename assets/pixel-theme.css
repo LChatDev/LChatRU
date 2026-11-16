@@ -199,3 +199,69 @@
   :root[data-pixel-theme] #messenger .mobile-screen-card { background: var(--tg-panel) !important; }
   :root[data-pixel-theme] #messenger .lce-editor[data-empty="true"]::before { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
+
+/* One composer field: hide the plain textarea once the animated editor exists,
+   and drop the extra Web A emoji button that sat beside it. */
+#composer:has(.lce-editor) > textarea,
+#composer:has(.lce-editor) > #message-input {
+  display: none !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: 0 0 0 !important;
+  overflow: hidden !important;
+}
+#composer {
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+}
+#composer .lce-editor {
+  position: relative;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: 100%;
+}
+#composer .lce-editor[data-empty="true"]::before {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: block !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+#composer > #emoji-button { display: none !important; }
+
+.pixel-appearance {
+  display: grid;
+  gap: 8px;
+  margin: 8px 8px 4px;
+  padding: 8px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--tg-accent, #6ab3f3) 12%, transparent);
+}
+.pixel-appearance-label {
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--tg-muted, #888);
+}
+.pixel-appearance-row { display: flex; gap: 6px; }
+.pixel-appearance-row button {
+  flex: 1;
+  min-height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.pixel-appearance-row button[aria-pressed="true"] {
+  background: var(--pixel-blue, var(--tg-accent, #5288c1));
+  color: #fff;
+}

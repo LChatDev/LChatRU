@@ -9,6 +9,7 @@ $siteInitial = htmlspecialchars(function_exists('mb_substr') ? mb_substr($name, 
 ?>
 <!doctype html>
 <html lang="ru" data-pixel-theme>
+<script>try{if(localStorage.getItem('lchat-skin')==='telegram')document.documentElement.removeAttribute('data-pixel-theme')}catch(e){}</script>
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0b1018"><meta name="description" content="LChat — личные и групповые чаты, голосовые и видеозвонки.">
@@ -19,8 +20,8 @@ $siteInitial = htmlspecialchars(function_exists('mb_substr') ? mb_substr($name, 
   <link rel="stylesheet" href="assets/mobile-shell.css?v=20261115-mobile1">
   <script src="assets/mobile-nav.js?v=20261115-mobile1" data-edition="community" defer></script>
   <script src="assets/mobile-shell.js?v=20261115-mobile1" defer></script>
-  <link rel="stylesheet" href="assets/pixel-theme.css?v=20261115-pixel1">
-  <script src="assets/pixel-theme.js?v=20261115-pixel1" defer></script>
+  <link rel="stylesheet" href="assets/pixel-theme.css?v=20261116-pixel2">
+  <script src="assets/pixel-theme.js?v=20261116-pixel2" defer></script>
 </head>
 <body>
   <div id="loading" class="loading"><span class="brand-mark"><?= $siteInitial ?></span><p>Подключаемся к <?= $siteName ?>…</p></div>

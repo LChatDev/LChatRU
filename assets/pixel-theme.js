@@ -1,11 +1,82 @@
 'use strict';
 (() => {
   const root = document.documentElement;
+  const english = root.lang === 'en';
+  try {
+    if (localStorage.getItem('lchat-skin') === 'telegram') root.removeAttribute('data-pixel-theme');
+  } catch (_) { /* keep the markup default */ }
+
+  const menu = document.getElementById('weba-menu');
+  if (menu && !menu.querySelector('.pixel-appearance')) {
+    const box = document.createElement('div');
+    box.className = 'pixel-appearance';
+    const skinLabel = document.createElement('div');
+    skinLabel.className = 'pixel-appearance-label';
+    skinLabel.textContent = english ? 'Look' : 'Оформление';
+    const skinRow = document.createElement('div');
+    skinRow.className = 'pixel-appearance-row';
+    skinRow.setAttribute('role', 'group');
+    skinRow.setAttribute('aria-label', skinLabel.textContent);
+    const modeLabel = document.createElement('div');
+    modeLabel.className = 'pixel-appearance-label';
+    modeLabel.textContent = english ? 'Theme' : 'Тема';
+    const modeRow = document.createElement('div');
+    modeRow.className = 'pixel-appearance-row';
+    modeRow.setAttribute('role', 'group');
+    modeRow.setAttribute('aria-label', modeLabel.textContent);
+
+    function paint() {
+      const pixel = root.hasAttribute('data-pixel-theme');
+      const light = root.dataset.lchatTheme === 'light';
+      for (const button of skinRow.children) button.setAttribute('aria-pressed', String(button.dataset.skin === (pixel ? 'pixel' : 'telegram')));
+      for (const button of modeRow.children) button.setAttribute('aria-pressed', String(button.dataset.mode === (light ? 'light' : 'dark')));
+    }
+    function setSkin(skin) {
+      const pixel = skin !== 'telegram';
+      root.toggleAttribute('data-pixel-theme', pixel);
+      try { localStorage.setItem('lchat-skin', pixel ? 'pixel' : 'telegram'); } catch (_) {}
+      paint();
+    }
+    function setMode(mode) {
+      const light = mode === 'light';
+      root.dataset.lchatTheme = light ? 'light' : 'dark';
+      const darkCss = document.getElementById('dark-theme-style');
+      const darkDetails = document.getElementById('dark-details-style');
+      if (darkCss) darkCss.disabled = light;
+      if (darkDetails) darkDetails.disabled = light;
+      try {
+        const saved = JSON.parse(localStorage.getItem('lchat-appearance') || '{}');
+        saved.theme = light ? 'light' : 'dark';
+        localStorage.setItem('lchat-appearance', JSON.stringify(saved));
+      } catch (_) {}
+      paint();
+    }
+    for (const [skin, label] of [['pixel', english ? 'Pixel' : 'Пиксель'], ['telegram', 'Telegram']]) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.skin = skin;
+      button.textContent = label;
+      button.addEventListener('click', () => setSkin(skin));
+      skinRow.append(button);
+    }
+    for (const [mode, label] of [['dark', english ? 'Dark' : 'Тёмная'], ['light', english ? 'Light' : 'Светлая']]) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.mode = mode;
+      button.textContent = label;
+      button.addEventListener('click', () => setMode(mode));
+      modeRow.append(button);
+    }
+    box.append(skinLabel, skinRow, modeLabel, modeRow);
+    menu.prepend(box);
+    paint();
+    new MutationObserver(paint).observe(root, {attributes: true, attributeFilter: ['data-lchat-theme', 'data-pixel-theme']});
+  }
+
   const header = document.querySelector('#messenger .sidebar-header');
   const search = document.getElementById('chat-filter');
   if (!header || !search) return;
 
-  const english = root.lang === 'en';
   const mobile = matchMedia('(max-width: 760px)');
   const toggle = document.createElement('button');
   toggle.type = 'button';
@@ -45,7 +116,6 @@
     if (mobile.matches && (search.value || document.activeElement === search)) setSearch(true, false);
   });
 
-  const menu = document.getElementById('weba-menu');
   const menuButton = document.getElementById('main-menu');
   const strip = document.querySelector('.sidebar-quick');
   const newChatItem = menu?.querySelector('[data-proxy-target="new-chat"]');
