@@ -1,6 +1,6 @@
 const CACHE = 'lchat-static-20261113-chat-sync1';
 const STATIC = [
-  '/assets/community.css?v=20261030-community1',
+  '/assets/community.css?v=20261101-mobile1',
   '/assets/community.js?v=20261030-community1',
   '/assets/style.css?v=20261026-login2',
   '/assets/theme.css?v=20261013-glass1',
@@ -30,7 +30,6 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
-  if (/\/assets\/animated-emoji\/[^/]+\.webp$/.test(url.pathname)) return;
   if (url.origin !== self.location.origin || !url.pathname.startsWith('/assets/')) return;
   event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
     if (response.ok && response.type === 'basic') {

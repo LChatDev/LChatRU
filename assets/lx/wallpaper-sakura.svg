@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF8F4"/>
+      <stop offset="45%" stop-color="#FDECE8"/>
+      <stop offset="100%" stop-color="#F8D5D8"/>
+    </linearGradient>
+    <radialGradient id="blushL" cx="12%" cy="78%" r="42%">
+      <stop offset="0%" stop-color="#F8BBD0" stop-opacity=".55"/>
+      <stop offset="100%" stop-color="#F8BBD0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blushR" cx="88%" cy="8%" r="38%">
+      <stop offset="0%" stop-color="#F48FB1" stop-opacity=".28"/>
+      <stop offset="100%" stop-color="#F48FB1" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="washi" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85 0.7" numOctaves="4" seed="7" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.95  0 0 0 0 0.90  0 0 0 0 0.88  0 0 0 0.18 0" result="t"/>
+      <feBlend in="SourceGraphic" in2="t" mode="multiply"/>
+    </filter>
+    <filter id="fiber" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="turbulence" baseFrequency="0.015 0.35" numOctaves="2" seed="3" result="f"/>
+      <feColorMatrix in="f" type="matrix" values="0 0 0 0 0.85  0 0 0 0 0.78  0 0 0 0 0.76  0 0 0 0.08 0"/>
+      <feBlend in="SourceGraphic" in2="f" mode="soft-light"/>
+    </filter>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6D4C41"/>
+      <stop offset="50%" stop-color="#4E342E"/>
+      <stop offset="100%" stop-color="#3E2723"/>
+    </linearGradient>
+    <g id="blossom">
+      <g fill="#F8BBD0" stroke="#F48FB1" stroke-width="0.6">
+        <ellipse cx="0" cy="-6.2" rx="3.1" ry="5.4"/>
+        <ellipse cx="5.9" cy="-1.9" rx="3.1" ry="5.4" transform="rotate(72)"/>
+        <ellipse cx="3.6" cy="5.1" rx="3.1" ry="5.4" transform="rotate(144)"/>
+        <ellipse cx="-3.6" cy="5.1" rx="3.1" ry="5.4" transform="rotate(-144)"/>
+        <ellipse cx="-5.9" cy="-1.9" rx="3.1" ry="5.4" transform="rotate(-72)"/>
+      </g>
+      <circle r="1.7" fill="#F9E79F" stroke="#F5D76E" stroke-width=".4"/>
+    </g>
+    <g id="blossomDeep">
+      <g fill="#F48FB1" stroke="#D81B60" stroke-width="0.45" stroke-opacity=".35">
+        <ellipse cx="0" cy="-5.2" rx="2.6" ry="4.6"/>
+        <ellipse cx="4.9" cy="-1.6" rx="2.6" ry="4.6" transform="rotate(72)"/>
+        <ellipse cx="3.0" cy="4.3" rx="2.6" ry="4.6" transform="rotate(144)"/>
+        <ellipse cx="-3.0" cy="4.3" rx="2.6" ry="4.6" transform="rotate(-144)"/>
+        <ellipse cx="-4.9" cy="-1.6" rx="2.6" ry="4.6" transform="rotate(-72)"/>
+      </g>
+      <circle r="1.4" fill="#FFE082"/>
+    </g>
+    <g id="blossomPale">
+      <g fill="#FDE7EE" stroke="#F48FB1" stroke-width="0.5">
+        <ellipse cx="0" cy="-4.6" rx="2.3" ry="4.0"/>
+        <ellipse cx="4.4" cy="-1.4" rx="2.3" ry="4.0" transform="rotate(72)"/>
+        <ellipse cx="2.7" cy="3.8" rx="2.3" ry="4.0" transform="rotate(144)"/>
+        <ellipse cx="-2.7" cy="3.8" rx="2.3" ry="4.0" transform="rotate(-144)"/>
+        <ellipse cx="-4.4" cy="-1.4" rx="2.3" ry="4.0" transform="rotate(-72)"/>
+      </g>
+      <circle r="1.2" fill="#FFF3C4"/>
+    </g>
+  </defs>
+  <rect width="1600" height="900" fill="url(#paper)"/>
+  <rect width="1600" height="900" fill="url(#blushL)"/>
+  <rect width="1600" height="900" fill="url(#blushR)"/>
+  <rect width="1600" height="900" filter="url(#washi)" fill="#FFF8F4" opacity=".35"/>
+  <rect width="1600" height="900" filter="url(#fiber)" fill="#F8D5D8" opacity=".25"/>
+  <!-- original cherry branch, upper right, reaching inward -->
+  <g fill="none" stroke="url(#wood)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1600 40 C 1480 80, 1400 40, 1280 90 C 1160 140, 1120 120, 980 200" stroke-width="7"/>
+    <path d="M1280 90 C 1260 40, 1180 20, 1120 48" stroke-width="3.2"/>
+    <path d="M1188 148 C 1160 210, 1200 250, 1160 310" stroke-width="3.5"/>
+    <path d="M1088 168 C 1020 150, 980 180, 920 168" stroke-width="2.6"/>
+    <path d="M1040 188 C 1010 230, 980 228, 950 270" stroke-width="2.2"/>
+    <path d="M1408 70 C 1390 20, 1340 8, 1296 36" stroke-width="2.4"/>
+    <path d="M1472 62 C 1500 100, 1488 140, 1520 168" stroke-width="2.4"/>
+  </g>
+  <g>
+    <use href="#blossom" transform="translate(1296,36) rotate(-12)"/>
+    <use href="#blossomPale" transform="translate(1336,18) rotate(20) scale(.9)"/>
+    <use href="#blossomDeep" transform="translate(1264,58) rotate(8) scale(.85)"/>
+    <use href="#blossom" transform="translate(1408,28) rotate(16) scale(1.05)"/>
+    <use href="#blossomPale" transform="translate(1456,48) rotate(-24)"/>
+    <use href="#blossomDeep" transform="translate(1508,70) rotate(10) scale(.8)"/>
+    <use href="#blossom" transform="translate(1518,168) rotate(28) scale(.95)"/>
+    <use href="#blossomPale" transform="translate(1488,120) rotate(-8) scale(.75)"/>
+    <use href="#blossom" transform="translate(1120,48) rotate(-18)"/>
+    <use href="#blossomPale" transform="translate(1164,28) rotate(32) scale(.85)"/>
+    <use href="#blossomDeep" transform="translate(1196,70) rotate(6) scale(.7)"/>
+    <use href="#blossom" transform="translate(1088,168) rotate(14)"/>
+    <use href="#blossomPale" transform="translate(1040,152) rotate(-20) scale(.9)"/>
+    <use href="#blossomDeep" transform="translate(980,172) rotate(8)"/>
+    <use href="#blossom" transform="translate(920,168) rotate(-16) scale(.8)"/>
+    <use href="#blossomPale" transform="translate(950,270) rotate(22)"/>
+    <use href="#blossom" transform="translate(1008,236) rotate(-10) scale(.75)"/>
+    <use href="#blossomDeep" transform="translate(1160,310) rotate(18) scale(.95)"/>
+    <use href="#blossomPale" transform="translate(1188,248) rotate(-6) scale(.8)"/>
+    <use href="#blossom" transform="translate(1140,214) rotate(30) scale(.7)"/>
+    <use href="#blossomPale" transform="translate(1224,120) rotate(12) scale(.65)"/>
+    <use href="#blossomDeep" transform="translate(1248,96) rotate(-28) scale(.7)"/>
+    <!-- a few already-fallen blossoms, very sparse -->
+    <use href="#blossomPale" transform="translate(420,760) rotate(40) scale(.7)" opacity=".8"/>
+    <use href="#blossomDeep" transform="translate(260,820) rotate(-16) scale(.55)" opacity=".7"/>
+    <use href="#blossom" transform="translate(610,840) rotate(10) scale(.6)" opacity=".65"/>
+    <use href="#blossomPale" transform="translate(780,790) rotate(-30) scale(.5)" opacity=".6"/>
+  </g>
+</svg>

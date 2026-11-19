@@ -5,10 +5,9 @@
   const input = document.getElementById('message-input');
   const messages = document.getElementById('message-items');
   if (!composer || !input || !messages) return;
-  const scriptUrl = document.currentScript?.src || new URL('assets/animated-emoji.js', document.baseURI).href;
-  const base = new URL('animated-emoji/', scriptUrl).href;
+  const base = '/assets/lchat-emoji/telegram-v1/';
   const categories = {'All':'Все','Smileys':'Смайлы','People':'Люди','Animals and Nature':'Природа','Food and Drink':'Еда','Activity':'Занятия','Travel and Places':'Места','Objects':'Предметы','Symbols':'Символы','Flags':'Флаги'};
-  let entries = [], byId = new Map(), category = 'All', loadPromise;
+  let entries = [], byId = new Map(), category = 'All', loadPromise, pickerMode = 'emoji';
   const button = document.createElement('button');
   button.type = 'button'; button.className = 'icon-button lce-toggle';
   button.title = 'Анимированные эмодзи'; button.setAttribute('aria-label', button.title);
@@ -26,8 +25,11 @@
   const grid = document.createElement('div'); grid.className = 'lce-grid';
   const status = document.createElement('div'); status.className = 'lce-status'; status.setAttribute('aria-live','polite');
   const credit = document.createElement('a'); credit.className = 'lce-credit'; credit.href = 'https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis'; credit.target = '_blank'; credit.rel = 'noopener noreferrer'; credit.textContent = 'Источник анимаций';
-  panel.append(header, search, tabs, grid, status, credit); document.body.append(panel);
-  function image(item) { const img = document.createElement('img'); img.loading = 'lazy'; img.decoding = 'async'; img.alt = item.name; img.title = item.name; img.draggable = false; img.src = base + item.id + '.webp'; return img; }
+  const smoothCredit = document.createElement('a'); smoothCredit.className = 'lce-credit'; smoothCredit.href = 'https://github.com/goforbg/telegram-emoji-gifs'; smoothCredit.target = '_blank'; smoothCredit.rel = 'noopener noreferrer'; smoothCredit.textContent = 'Источник плавных анимаций';
+  const modes = document.createElement('div'); modes.className = 'lce-modes'; modes.setAttribute('role', 'group'); modes.setAttribute('aria-label', 'Вид изображений');
+  for (const [mode, label] of [['emoji','Эмодзи'],['sticker','Стикеры']]) { const item=document.createElement('button'); item.type='button'; item.textContent=label; item.dataset.mode=mode; item.setAttribute('aria-pressed',String(mode===pickerMode)); item.addEventListener('click',()=>{pickerMode=mode; for(const other of modes.children) other.setAttribute('aria-pressed',String(other.dataset.mode===mode)); renderGrid();}); modes.append(item); }
+  panel.append(header, modes, search, tabs, grid, status, credit, smoothCredit); document.body.append(panel);
+  function image(item) { const img = document.createElement('img'); img.loading = 'lazy'; img.decoding = 'async'; img.alt = item.name; img.title = item.name; img.draggable = false; img.src = base + item.id + '.webp?v=20261108-smooth1'; return img; }
   // Keep the existing textarea as the application's plain-text model, while editing
   // a contenteditable view so animated emoji can be seen before sending.
   function setupEditor() {
@@ -113,15 +115,15 @@
     const filtered = entries.filter(item => (category === 'All' || item.category === category) && (!q || (item.name + ' ' + (categories[item.category] || '')).toLocaleLowerCase().includes(q)));
     const fragment = document.createDocumentFragment();
     for (const item of filtered) {
-      const option = document.createElement('button'); option.type = 'button'; option.title = item.name; option.setAttribute('aria-label', item.name); option.append(image(item));
+      const option = document.createElement('button'); option.type = 'button'; option.title = item.name; option.setAttribute('aria-label', item.name); option.append(image(item)); if(pickerMode==='sticker') option.classList.add('lce-sticker-option');
       option.addEventListener('click', () => {
         const start = input.selectionStart, end = input.selectionEnd;
-        input.setRangeText('[lce:' + item.id + ']', start, end, 'end');
+        if(pickerMode==='sticker') { if(input.value.trim()) { status.textContent='Для стикера отправьте или очистите текущий текст.'; return; } input.value='[lce:' + item.id + ']'; composer.requestSubmit(); } else input.setRangeText('[lce:' + item.id + ']', start, end, 'end');
         input.dispatchEvent(new Event('input', {bubbles:true})); input.focus(); hide();
       }); fragment.append(option);
     }
     grid.replaceChildren(fragment); grid.scrollTop = 0;
-    status.textContent = filtered.length ? `Найдено: ${filtered.length}` : 'Эмодзи не найдены';
+    status.textContent = filtered.length ? (pickerMode==='sticker' ? `Стикеры из анимированных эмодзи: ${filtered.length}` : `Найдено: ${filtered.length}`) : 'Ничего не найдено';
     position();
   }
   function replaceText(root) {
@@ -148,7 +150,7 @@
     else el.querySelectorAll?.('.message-text').forEach(replaceText);
   }
   function load() {
-    return loadPromise ||= fetch(new URL('emoji-catalog.js?v=20261107-2', scriptUrl), {credentials:'same-origin'}).then(r => {
+    return loadPromise ||= fetch('assets/emoji-catalog.js?v=20261107-2', {credentials:'same-origin'}).then(r => {
       if (!r.ok) throw Error('Не удалось загрузить каталог'); return r.json();
     }).then(data => {
       entries = data.filter(x => /^[a-f0-9]{16}$/.test(x.id) && typeof x.name === 'string' && Object.hasOwn(categories, x.category));

@@ -3,6 +3,18 @@ declare(strict_types=1);
 if (!defined('LCHAT_INTERNAL')) { http_response_code(404); exit; }
 
 return [
+    'public_url' => 'https://chat.example.com/',
+    'storage_dir' => __DIR__ . '/files',
+    // Preserve this private key file across deployments to read encrypted history.
+    'message_key_file' => getenv('LCHAT_MESSAGE_KEY_FILE') ?: '',
+    // TLS SMTP for registration and password-reset email. Keep credentials private.
+    'smtp' => [
+        'host' => getenv('LCHAT_SMTP_HOST') ?: '',
+        'port' => 465,
+        'username' => getenv('LCHAT_SMTP_USER') ?: '',
+        'password' => getenv('LCHAT_SMTP_PASSWORD') ?: '',
+    ],
+
     // Сервер запросов: host — хостинг; pc — HTTPS-сервер на вашем ПК.
     'backend' => ['mode' => 'host', 'url' => '', 'proxy_secret' => ''],
     'database' => [
@@ -30,5 +42,4 @@ return [
         'ttl' => 3600,
     ],
     'call_transport' => 'relay',
-    'public_url' => 'https://your-domain.example',
 ];

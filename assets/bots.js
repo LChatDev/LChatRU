@@ -24,12 +24,16 @@
     const input = document.createElement('input'); input.required = true; input.minLength = min; input.maxLength = max; input.placeholder = placeholder;
     label.append(input); return [label, input];
   }
-  function showToken(title, token) {
+  function showToken(title, token, ai = false) {
     modal(title, body => {
       body.append(node('p', 'muted', 'Скопируйте токен сейчас. Позже он не показывается; его можно только заменить.'));
       const input = document.createElement('input'); input.className = 'bot-token'; input.readOnly = true; input.value = token; input.setAttribute('aria-label','Токен бота');
       body.append(input, button('Скопировать токен','primary wide',async () => {await navigator.clipboard.writeText(token);toast('Токен скопирован');}));
       body.append(node('p','muted small','Bot API: https://chat.lbs.su/bot<TOKEN>/getMe. Никому не передавайте токен.'));
+      if (ai) {
+        body.append(node('p','muted small','AI-модель: Kilo Auto Free. Бота нужно запускать на своём ПК или сервере.'));
+        body.append(button('Скачать Python-шаблон','button subtle wide',()=>{window.location.href='examples/kilo-ai-bot.py';}));
+      }
       body.append(button('Готово','button subtle wide',openBots));
     });
   }
@@ -58,6 +62,7 @@
     const data = await request();
     modal('Мои боты', body => {
       body.append(node('p','muted small','Создайте бота и получите API-токен через @BotCreator или форму ниже. Боты получают сообщения в личном чате и группах.'));
+      if (data.aibot_id) body.append(button('✨ Открыть @AiBot','primary wide',async()=>{await startChat({id:data.aibot_id});const input=byId('message-input');if(input){input.value='/start';input.focus();}}));
       if (data.creator_id) body.append(button('Написать @BotCreator','primary wide',async()=>{await startChat({id:data.creator_id});const input=byId('message-input');if(input){input.value='/start';input.focus();}}));
       body.append(button('Документация Bot API','button subtle wide',()=>{window.location.href='docs.php';}));
       for (const bot of data.bots) {
@@ -72,8 +77,9 @@
       const [nameLabel,name] = inputLabel('Имя бота',2,60,'Например, Помощник');
       const [userLabel,username] = inputLabel('Логин бота',6,32,'Например, helperbot');
       const submit = document.createElement('button');submit.type='submit';submit.className='primary wide';submit.textContent='Создать бота';
-      form.append(nameLabel,userLabel,node('p','muted small','Логин должен заканчиваться на bot.'),submit);
-      form.onsubmit=async event=>{event.preventDefault();submit.disabled=true;try{const created=await request('create',{name:name.value,username:username.value});showToken('Токен @'+created.username,created.token);}catch(error){report(error);}finally{submit.disabled=false;}};
+      const aiSubmit = document.createElement('button');aiSubmit.type='submit';aiSubmit.className='button subtle wide';aiSubmit.textContent='✨ Создать бота с ИИ';
+      form.append(nameLabel,userLabel,node('p','muted small','Логин должен заканчиваться на bot. AI-бота вы хостите самостоятельно.'),submit,aiSubmit);
+      form.onsubmit=async event=>{event.preventDefault();const ai=event.submitter===aiSubmit;submit.disabled=true;aiSubmit.disabled=true;try{const created=await request(ai?'create-ai':'create',{name:name.value,username:username.value});showToken('Токен @'+created.username,created.token,ai);}catch(error){report(error);}finally{submit.disabled=false;aiSubmit.disabled=false;}};
       body.append(form);
     });
   }

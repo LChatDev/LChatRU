@@ -27,7 +27,13 @@
         const status=window.LChatRelativePresence?.(p.last_seen,chat.peer.in_call)||'Не был в сети';
         hero.append(photo,title,node('p','profile-status',status));body.append(hero);
         const actions=node('div','profile-actions');
-        const action=(symbol,label,fn)=>{const b=button('','profile-action',fn);b.append(node('span','profile-action-icon',symbol),node('span','',label));actions.append(b);};
+        const profileIcons={
+          '●':'<path d="M4 5.5A3.5 3.5 0 0 1 7.5 2h9A3.5 3.5 0 0 1 20 5.5v7a3.5 3.5 0 0 1-3.5 3.5H10l-4.5 3v-3.2A3.5 3.5 0 0 1 4 12.5z"/>',
+          '☎':'<path d="M5 3h3l2 5-2 1.5a15 15 0 0 0 6.5 6.5L16 14l5 2v3a2 2 0 0 1-2.2 2C10.4 20 4 13.6 3 5.2A2 2 0 0 1 5 3z"/>',
+          '▣':'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3z"/>',
+          '🎁':'<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M3 7h18v3H3zm9 0v14M12 7C8 7 7 6 7 4.7a2 2 0 0 1 4-1L12 7zm0 0c4 0 5-1 5-2.3a2 2 0 0 0-4-1L12 7z"/>'
+        };
+        const action=(symbol,label,fn)=>{const b=button('','profile-action',fn),icon=node('span','profile-action-icon');icon.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${profileIcons[symbol]}</svg>`;b.append(icon,node('span','',label));actions.append(b);};
         action('●','Чат',()=>dialog.close());
         action('☎','Звонок',()=>{dialog.close();document.getElementById('audio-call')?.click();});
         action('▣','Видео',()=>{dialog.close();document.getElementById('video-call')?.click();});
@@ -43,7 +49,7 @@
       });
     } catch(error){if(serial===requestId && dialog.open){dialog.classList.remove('profile-view');modal('Профиль',body=>body.append(node('p','form-error',error.message||'Не удалось загрузить профиль.')));}}
   }
-  function giftArt(gift){const art=node('span','profile-gift-emoji',gift.emoji);if(Number.isInteger(gift.sprite)&&gift.sprite>=0&&gift.sprite<(gift.sheet?16:9)){art.textContent='';art.classList.add('profile-sprite');art.dataset.sprite=gift.sprite;art.dataset.variant=gift.variant;if(['one','two'].includes(gift.sheet)){art.dataset.sheet=gift.sheet;art.style.setProperty('--sprite-x',(gift.sprite%4)*100/3+'%');art.style.setProperty('--sprite-y',Math.floor(gift.sprite/4)*100/3+'%');}}return art;}
+  function giftArt(gift){const art=node('span','profile-gift-emoji',gift.emoji);if(/^gift_[0-9]{19}$/.test(gift.tgs||'')){art.textContent='';art.classList.add('gift-tgs');art.dataset.tgs=gift.tgs;const img=node('img','tgs-preview');img.src='/assets/lchat-gifts/webp/'+gift.tgs+'.webp';img.alt=gift.name;img.loading='lazy';art.append(img);return art;}if(Number.isInteger(gift.sprite)&&gift.sprite>=0&&gift.sprite<(gift.sheet?16:9)){art.textContent='';art.classList.add('profile-sprite');art.dataset.sprite=gift.sprite;art.dataset.variant=gift.variant;if(['one','two'].includes(gift.sheet)){art.dataset.sheet=gift.sheet;art.style.setProperty('--sprite-x',(gift.sprite%4)*100/3+'%');art.style.setProperty('--sprite-y',Math.floor(gift.sprite/4)*100/3+'%');}}return art;}
   function openGiftPicker(chat,person,catalog){
     let pending=null,selected=null;
     modal('Подарок для @'+person.username,body=>{

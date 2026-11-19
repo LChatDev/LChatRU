@@ -1,0 +1,90 @@
+/* Shared presentation for LChat secondary pages; document pages stay unstyled. */
+body.lchat-secondary { background:#0e1621!important; color:#f5f7fa!important; font-family:Roboto,"Segoe UI",Arial,sans-serif!important; }
+.lchat-secondary a:focus-visible,.lchat-secondary button:focus-visible,.lchat-secondary input:focus-visible,.lchat-secondary select:focus-visible { outline:3px solid #6ab3f3!important; outline-offset:2px; }
+.lchat-secondary .brand-mark,.lchat-secondary .brand-icon,.lchat-secondary .reset-logo { background:#2378c9!important; color:#fff!important; box-shadow:none!important; }
+.lchat-secondary .topbar,.lchat-secondary .market-header { background:#17212b!important; border-color:#263646!important; backdrop-filter:none!important; }
+.lchat-secondary .hero,.lchat-secondary .market-intro,.lchat-secondary .version-card,.lchat-secondary .install,.lchat-secondary .reset-card { background:#17212b!important; border:1px solid #263646!important; box-shadow:none!important; }
+.lchat-secondary .eyebrow,.lchat-secondary .section-eyebrow,.lchat-secondary .market-kicker,.lchat-secondary .reset-eyebrow { color:#6ab3f3!important; }
+.lchat-secondary a,.lchat-secondary .text-link,.lchat-secondary .subtle-link { color:#8cc8f8; }
+.lchat-secondary .brand,.lchat-secondary .hero h1,.lchat-secondary .section-heading h2 { color:#f5f7fa!important; }
+.lchat-secondary .background-glow,.lchat-pay .hero-art { display:none!important; }
+.lchat-pay .hero { display:block; min-height:0; margin-top:20px; padding:42px!important; border-radius:20px; }
+.lchat-pay .hero h1 { font-size:clamp(32px,4vw,50px); }
+.lchat-pay .hero h1 span,.lchat-pay .premium-intro h2 span { color:#8cc8f8!important; background:none!important; -webkit-text-fill-color:currentColor; }
+.lchat-pay .hero-copy>p,.lchat-pay .section-heading p,.lchat-pay .premium-intro p,.lchat-pay .faq p,.lchat-pay .benefit p { color:#a8bac9!important; }
+.lchat-pay .ticket-card,.lchat-pay .benefit,.lchat-pay .faq article,.lchat-pay .ticket-calculator,.lchat-pay .subscription,.lchat-pay .availability { background:#17212b!important; border-color:#263646!important; box-shadow:none!important; }
+.lchat-pay .ticket-card:after { display:none; }
+.lchat-pay .ticket-symbol,.lchat-pay .premium-emblem { background:#2b5278!important; color:#fff!important; box-shadow:none!important; text-shadow:none!important; transform:none!important; }
+.lchat-pay .primary-link,.lchat-pay .premium-buy,.lchat-pay .custom-buy,.lchat-pay .dialog-ok { background:#2378c9!important; color:#fff!important; box-shadow:none!important; }
+.lchat-pay .ticket-buy { background:#223545!important; color:#d9ebfa!important; border-color:#263646!important; }
+.lchat-pay dialog { background:#17212b!important; color:#f5f7fa!important; border-color:#263646!important; }
+.lchat-apps .app-icon { background:#2378c9!important; color:#fff!important; box-shadow:none!important; }
+.lchat-apps .version-card.latest { border-color:#477ca5!important; }
+.lchat-apps .version-card li,.lchat-apps .hero p { color:#c2d0dd; }
+.lchat-apps .version-number b,.lchat-apps .download { background:#2378c9!important; color:#fff!important; }
+.lchat-apps .version-number .archive,.lchat-apps .checksum { background:#223545!important; color:#c2d0dd!important; }
+.lchat-market .market-intro { background:#17212b!important; border-color:#263646!important; box-shadow:none!important; }
+.lchat-market .intro-orbit { background:#223545!important; border:0!important; }
+.lchat-market .intro-orbit:before { display:none; }
+.lchat-market .card-surface,.lchat-market .collected,.lchat-market .received-list,.lchat-market .manage-form,.lchat-market .gift-dialog { background:#17212b!important; border-color:#263646!important; box-shadow:none!important; }
+.lchat-market .card-surface:before { display:none; }
+.lchat-market .filter.active,.lchat-market .confirm-gift,.lchat-market .manage-form button { background:#2378c9!important; color:#fff!important; border-color:#2378c9!important; }
+.lchat-market .filter,.lchat-market .market-search { background:#1d2c3b!important; border-color:#263646!important; }
+.lchat-market .gift-name { color:#f5f7fa!important; }
+.lchat-support .page { max-width:760px; }
+.lchat-support nav a,.lchat-support article a { color:#8cc8f8; }
+.lchat-support article { background:#17212b!important; border-color:#263646!important; box-shadow:none!important; }
+.lchat-support .support-option { background:#1d2c3b!important; border-color:#263646!important; box-shadow:none!important; }
+.lchat-support .support-icon { background:#2b5278!important; color:#d9ebfa!important; }
+.lchat-support .support-option strong,.lchat-support h1 { color:#f5f7fa!important; }
+.lchat-support p,.lchat-support .support-option span:last-child,.lchat-support .support-note { color:#b7c8d8!important; }
+.lchat-reset .reset-card { background:transparent!important; border:0!important; box-shadow:none!important; backdrop-filter:none!important; }
+.lchat-reset a,.lchat-reset .reset-eyebrow { color:#8cc8f8!important; }
+.lchat-reset .reset-subtitle,.lchat-reset .reset-help,.lchat-reset .reset-foot { color:#a8bac9!important; }
+.lchat-reset .reset-card input:not([type=hidden]) { background:#1d2c3b!important; color:#fff!important; border-color:#263646!important; }
+.lchat-reset .reset-card button,.lchat-reset .reset-button { background:#2378c9!important; color:#fff!important; }
+.lchat-docs .layout,.lchat-docs .content,.lchat-docs .toc { background:#17212b!important; border-color:#263646!important; color:#f5f7fa!important; }
+.lchat-docs code { overflow-wrap:anywhere; word-break:break-word; }
+.lchat-docs pre code { overflow-wrap:normal; word-break:normal; }
+.lchat-admin #admin-dashboard section,.lchat-admin #admin-dashboard .admin-hero,.lchat-admin #admin-dashboard .admin-stat,.lchat-admin .admin-nav { background:#17212b!important; border-color:#263646!important; box-shadow:none!important; }
+.lchat-admin .brand-mark { background:#2378c9!important; color:white!important; }
+.lchat-secondary ::selection { background:#2378c9; color:white; }
+/* The same stored appearance choice also applies to public secondary screens. */
+html[data-lchat-theme="light"] { color-scheme:light; }
+html[data-lchat-theme="light"] body.lchat-secondary { background:#f4f6f8!important; color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-secondary .topbar,html[data-lchat-theme="light"] .lchat-secondary .market-header { background:#fff!important; border-color:#e0e8ef!important; }
+html[data-lchat-theme="light"] .lchat-secondary .hero,html[data-lchat-theme="light"] .lchat-secondary .market-intro,html[data-lchat-theme="light"] .lchat-secondary .version-card,html[data-lchat-theme="light"] .lchat-secondary .install { background:#fff!important; border-color:#e0e8ef!important; }
+html[data-lchat-theme="light"] .lchat-secondary .brand,html[data-lchat-theme="light"] .lchat-secondary .hero h1,html[data-lchat-theme="light"] .lchat-secondary .section-heading h2 { color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-secondary a,html[data-lchat-theme="light"] .lchat-secondary .text-link,html[data-lchat-theme="light"] .lchat-secondary .subtle-link { color:#2378c9; }
+html[data-lchat-theme="light"] .lchat-secondary .eyebrow,html[data-lchat-theme="light"] .lchat-secondary .section-eyebrow,html[data-lchat-theme="light"] .lchat-secondary .market-kicker,html[data-lchat-theme="light"] .lchat-secondary .reset-eyebrow { color:#2378c9!important; }
+html[data-lchat-theme="light"] .lchat-pay .hero h1 span,html[data-lchat-theme="light"] .lchat-pay .premium-intro h2 span { color:#2378c9!important; }
+html[data-lchat-theme="light"] .lchat-pay .hero-copy>p,html[data-lchat-theme="light"] .lchat-pay .section-heading p,html[data-lchat-theme="light"] .lchat-pay .premium-intro p,html[data-lchat-theme="light"] .lchat-pay .faq p,html[data-lchat-theme="light"] .lchat-pay .benefit p { color:#5f7181!important; }
+html[data-lchat-theme="light"] .lchat-pay .ticket-card,html[data-lchat-theme="light"] .lchat-pay .benefit,html[data-lchat-theme="light"] .lchat-pay .faq article,html[data-lchat-theme="light"] .lchat-pay .ticket-calculator,html[data-lchat-theme="light"] .lchat-pay .subscription,html[data-lchat-theme="light"] .lchat-pay .availability { background:#fff!important; border-color:#e0e8ef!important; color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-pay .availability p,html[data-lchat-theme="light"] .lchat-pay .custom-copy p,html[data-lchat-theme="light"] .lchat-pay .ticket-note,html[data-lchat-theme="light"] .lchat-pay .rate-note,html[data-lchat-theme="light"] .lchat-pay .card-label,html[data-lchat-theme="light"] .lchat-pay .planned,html[data-lchat-theme="light"] .lchat-pay .subscription small,html[data-lchat-theme="light"] .lchat-pay .subscription-actions label,html[data-lchat-theme="light"] .lchat-pay .premium-total,html[data-lchat-theme="light"] .lchat-pay .custom-price span { color:#5f7181!important; }
+html[data-lchat-theme="light"] .lchat-pay .quantity-control,html[data-lchat-theme="light"] .lchat-pay .subscription-actions select { background:#edf2f6!important; border-color:#dce6ee!important; color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-pay .quantity-control input,html[data-lchat-theme="light"] .lchat-pay .quantity-control button,html[data-lchat-theme="light"] .lchat-pay .custom-price output,html[data-lchat-theme="light"] .lchat-pay .premium-total output { color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-pay .ticket-buy { background:#e8f2fa!important; color:#1a4f7f!important; border-color:#dce6ee!important; }
+html[data-lchat-theme="light"] .lchat-pay dialog { background:#fff!important; color:#17212b!important; border-color:#e0e8ef!important; }
+html[data-lchat-theme="light"] .lchat-pay .dialog-close,html[data-lchat-theme="light"] .lchat-pay .dialog-inner p { color:#5f7181!important; }
+html[data-lchat-theme="light"] .lchat-apps .hero p,html[data-lchat-theme="light"] .lchat-apps .version-card li,html[data-lchat-theme="light"] .lchat-apps .meta,html[data-lchat-theme="light"] .lchat-apps .section-heading>span { color:#5f7181!important; }
+html[data-lchat-theme="light"] .lchat-apps .version-number .archive,html[data-lchat-theme="light"] .lchat-apps .checksum { background:#e8f2fa!important; color:#1a4f7f!important; }
+html[data-lchat-theme="light"] .lchat-apps .requirements span { background:#edf2f6!important; border-color:#e0e8ef!important; color:#40596d!important; }
+html[data-lchat-theme="light"] .lchat-market .card-surface,html[data-lchat-theme="light"] .lchat-market .collected,html[data-lchat-theme="light"] .lchat-market .received-list,html[data-lchat-theme="light"] .lchat-market .manage-form,html[data-lchat-theme="light"] .lchat-market .gift-dialog { background:#fff!important; border-color:#e0e8ef!important; color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-market .gift-name,html[data-lchat-theme="light"] .lchat-market .gift-open { color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-market .filter,html[data-lchat-theme="light"] .lchat-market .market-search { background:#edf2f6!important; color:#40596d!important; border-color:#e0e8ef!important; }
+html[data-lchat-theme="light"] .lchat-market .filter.active { background:#2378c9!important; color:#fff!important; }
+html[data-lchat-theme="light"] .lchat-market .market-search input { color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-market .catalog-total,html[data-lchat-theme="light"] .lchat-market .market-empty,html[data-lchat-theme="light"] .lchat-market .gift-dialog p,html[data-lchat-theme="light"] .lchat-market .gift-dialog small { color:#5f7181!important; }
+html[data-lchat-theme="light"] .lchat-market .gift-dialog input,html[data-lchat-theme="light"] .lchat-market .manage-form input,html[data-lchat-theme="light"] .lchat-market .manage-form select { background:#edf2f6!important; color:#17212b!important; border-color:#dce6ee!important; }
+html[data-lchat-theme="light"] .lchat-support article,html[data-lchat-theme="light"] .lchat-support .support-option { background:#fff!important; border-color:#e0e8ef!important; color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-support .support-option strong,html[data-lchat-theme="light"] .lchat-support h1 { color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-support p,html[data-lchat-theme="light"] .lchat-support .support-option span:last-child,html[data-lchat-theme="light"] .lchat-support .support-note { color:#5f7181!important; }
+html[data-lchat-theme="light"] .lchat-reset .reset-card { color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-reset .reset-subtitle,html[data-lchat-theme="light"] .lchat-reset .reset-help,html[data-lchat-theme="light"] .lchat-reset .reset-foot { color:#5f7181!important; }
+html[data-lchat-theme="light"] .lchat-reset .reset-card input:not([type=hidden]) { background:#fff!important; color:#17212b!important; border-color:#dce6ee!important; }
+html[data-lchat-theme="light"] .lchat-docs .layout,html[data-lchat-theme="light"] .lchat-docs .content,html[data-lchat-theme="light"] .lchat-docs .toc,html[data-lchat-theme="light"] .lchat-docs .section { background:#fff!important; border-color:#e0e8ef!important; color:#17212b!important; }
+html[data-lchat-theme="light"] .lchat-docs .section p,html[data-lchat-theme="light"] .lchat-docs .steps,html[data-lchat-theme="light"] .lchat-docs .toc a { color:#40596d!important; }
+@media(max-width:600px){.lchat-pay .hero{padding:24px 20px!important}.lchat-pay .section{padding-top:52px}.lchat-support article{padding:24px 20px}.lchat-secondary .topbar{backdrop-filter:none!important}}
+@media(prefers-reduced-motion:reduce){.lchat-secondary *,.lchat-secondary *::before,.lchat-secondary *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+.lchat-admin{font-family:system-ui,sans-serif!important}.lchat-admin #admin-dashboard{max-width:1120px;margin:auto;padding:24px 18px}.lchat-admin #admin-dashboard>section{border-radius:16px;padding:24px;margin:20px 0;scroll-margin-top:80px}.lchat-admin .admin-nav{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;border-radius:12px;padding:8px}.lchat-admin .admin-nav a{white-space:nowrap;padding:12px;color:#c9d8e6;text-decoration:none;border-radius:8px}.lchat-admin .admin-nav a:hover{background:#263646}.lchat-admin #admin-dashboard h2{font-size:20px;font-weight:600}.lchat-admin #admin-dashboard p{line-height:1.6}.lchat-admin #admin-dashboard input,.lchat-admin #admin-dashboard select,.lchat-admin #admin-dashboard button{min-height:44px;max-width:100%;border-radius:10px}.lchat-admin #admin-dashboard form{flex-wrap:wrap;gap:10px}.lchat-admin #admin-dashboard textarea{max-width:100%;min-height:90px}.lchat-admin #mod-messages{max-height:60vh;overflow:auto;overscroll-behavior:contain}.lchat-admin .admin-stat:after{display:none!important}@media(max-width:600px){.lchat-admin #admin-dashboard{padding:12px 10px}.lchat-admin #admin-dashboard>section{padding:16px}.lchat-admin .admin-hero{flex-wrap:wrap;gap:16px}.lchat-admin #admin-dashboard form input{min-width:0;flex:1 1 160px}}

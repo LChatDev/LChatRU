@@ -35,6 +35,7 @@ function rewards_catalog(): array {
         $sprite=-1;$sheet='';foreach($sheets as $name=>$ids){$position=array_search($id,$ids,true);if($position!==false){$sprite=$position;$sheet=$name;break;}}
         $items[$id]=[$emoji,$ru,$price,$sprite,$category,'original',$sheet];
     }
+    foreach (require __DIR__.'/gift-tgs-catalog.php' as $id=>$gift) { if (isset($items[$id])) throw new LogicException('Duplicate gift identifier'); $items[$id]=$gift; }
     return $items;
 }
 function rewards_wallet(int $uid): array {

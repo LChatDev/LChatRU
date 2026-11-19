@@ -1,0 +1,71 @@
+/* Soft macOS-inspired light, with dark translucent surfaces for readable text. */
+:root {
+  --lchat-wallpaper: radial-gradient(ellipse at 14% 12%, #e081b6 0%, transparent 38%), radial-gradient(ellipse at 83% 8%, #7355a8 0%, transparent 39%), radial-gradient(ellipse at 76% 80%, #194b80 0%, transparent 48%), linear-gradient(145deg, #432554 5%, #172b52 53%, #10182e 100%);
+}
+html, body, .messenger, .auth-layout, .conversation {
+  background: var(--lchat-wallpaper) fixed !important;
+}
+.conversation::before { display: none !important; }
+.sidebar, .sidebar-header, .sidebar-quick {
+  background: rgba(20, 23, 39, .64) !important;
+  backdrop-filter: blur(32px) saturate(155%);
+  -webkit-backdrop-filter: blur(32px) saturate(155%);
+  box-shadow: inset -1px 0 rgba(255, 255, 255, .08), 12px 0 32px rgba(8, 10, 25, .12) !important;
+}
+.auth-box, .chat-header, .composer, .message-composer {
+  background: linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.025)), rgba(22, 24, 40, .62) !important;
+  backdrop-filter: blur(30px) saturate(155%);
+  -webkit-backdrop-filter: blur(30px) saturate(155%);
+  border-color: rgba(255, 255, 255, .15) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.10), 0 12px 36px rgba(6,8,22,.15);
+}
+.chat-row, .icon-button, .quick-action, .auth-box input { transition: background-color .28s ease, border-color .28s ease, box-shadow .28s ease, transform .28s ease !important; }
+.chat-row:hover, .icon-button:hover { background-color: rgba(255,255,255,.09) !important; }
+.chat-list { background: transparent !important; }
+.verified-badge { color: #68b5ff; font-weight: 800; }
+.auth-box .registration-consent { display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; font-size: 13px; }
+.auth-box .registration-consent[hidden] { display: none !important; }
+.registration-consent input { margin: 3px 0 0; }
+.registration-consent a { color: #cabdff; text-decoration: underline; }
+.sidebar-quick {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.auth-side { flex-direction: column; gap: 20px; }
+.auth-box {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.auth-bottom {
+  position: static !important;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .auth-layout { align-items: flex-start !important; }
+  .auth-side {
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 24px 18px max(24px, env(safe-area-inset-bottom)) !important;
+  }
+  .auth-box { max-width: 400px; padding: 0 !important; }
+  .auth-bottom { padding: 0 4px; }
+  .sidebar-header, .sidebar-quick { box-shadow: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-row, .icon-button, .quick-action, .auth-box input { transition: none !important; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .sidebar, .sidebar-header, .chat-header, .composer, .message-composer { background: #171b29 !important; }
+}

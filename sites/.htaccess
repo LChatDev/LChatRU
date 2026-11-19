@@ -1,0 +1,6 @@
+Options -Indexes
+RewriteEngine On
+RewriteRule ^([A-Za-z0-9_]{3,32})(?:/(.*))?$ render.php?slug=$1&path=$2 [B,QSA,L]
+<FilesMatch "^\.htaccess$">
+  Require all denied
+</FilesMatch>

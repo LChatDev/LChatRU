@@ -8,6 +8,11 @@ ini_set('display_errors', '0');
 ini_set('session.use_strict_mode', '1');
 ini_set('session.use_only_cookies', '1');
 
+function lchat_file_path(string $name, bool $write = false): string {
+    $directory = (string)(config()['storage_dir'] ?? (__DIR__ . '/files'));
+    return rtrim($directory, '/' . chr(92)) . '/' . $name;
+}
+
 function config(): array {
     static $config;
     if ($config === null) {
@@ -62,6 +67,21 @@ function db(): PDO {
 }
 function query(string $sql, array $params = []): PDOStatement {
     $s = db()->prepare($sql); $s->execute($params); return $s;
+}
+/** Delete one message while keeping its existing chat/author restrictions. */
+function delete_message_row(int $messageId, int $chatId, ?int $authorId = null): int {
+    $sql = 'DELETE FROM messages WHERE id = ? AND chat_id = ?';
+    $params = [$messageId, $chatId];
+    if ($authorId !== null) { $sql .= ' AND user_id = ?'; $params[] = $authorId; }
+    $pdo = db();
+    if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'mysql') return query($sql, $params)->rowCount();
+    // This host's native MySQL prepared DELETE can fail with ER_NEED_REPREPARE
+    // (1615) when MySQL loads the many dependent message tables. Keep this
+    // workaround limited to this parameterized statement and restore the mode.
+    $emulated = (bool)$pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES);
+    if (!$emulated) $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+    try { return query($sql, $params)->rowCount(); }
+    finally { if (!$emulated) $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); }
 }
 function one(string $sql, array $params = []): ?array { return query($sql, $params)->fetch() ?: null; }
 function request_is_https(): bool {
@@ -178,6 +198,8 @@ require_once __DIR__ . '/apis/features.php';
 require_once __DIR__ . '/apis/rewards.php';
 require_once __DIR__ . '/apis/bot_accounts.php';
 require_once __DIR__ . '/apis/bot_creator.php';
+require_once __DIR__ . '/apis/service_bot.php';
+require_once __DIR__ . '/apis/user_sites.php';
 require_once __DIR__ . '/apis/bot_platform.php';
 require_once __DIR__ . '/apis/bot_files.php';
 require_once __DIR__ . '/apis/presence.php';

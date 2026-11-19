@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 define('LCHAT_INTERNAL', true);
-require_once __DIR__ . '/apis/frontend_mode.php';
-if (frontend_is_remote()) { require __DIR__ . '/channel-pc.php'; exit; }
 require __DIR__.'/app.php';
 header('Cache-Control: no-store');
 try {
