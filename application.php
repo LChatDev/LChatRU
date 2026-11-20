@@ -5,12 +5,21 @@ header('X-Content-Type-Options: nosniff');
 
 $versions = [
     [
+        'version' => '2.2.1',
+        'date' => '2026-11-20',
+        'size' => '22.7 MB',
+        'sha256' => '1467890018f2fe83009a36410b95fd01d10d80af26411806ddf5265e188c105f',
+        'file' => 'https://github.com/LChatDev/LChat/releases/download/clients-2026.11.20/LChat-2.2.1-universal.apk',
+        'latest' => true,
+        'changes' => ['Принятие соглашения и инструкция подтверждения email.','Восстановление пароля с экрана входа.'],
+    ],
+    [
         'version' => '2.2.0',
         'date' => '30 октября 2026',
         'size' => '22,7 МБ',
         'sha256' => 'aafbe3a5ab22bc02b7fbd0be15a37c679c2b9e549aff2ad58cae3b354e5bb6fb',
         'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.2.0/LChat-2.2.0-universal.apk',
-        'latest' => true,
+        'latest' => false,
         'changes' => [
             'Нативный интерфейс чатов, групп и каналов в стиле LChat.',
             'Отдельный сворачиваемый экран звонка и список участников.',
@@ -95,6 +104,7 @@ $versions = [
       </div>
     </section>
 
+<section class="install"><h2>LChat для Windows</h2><p>Windows 10/11 x64. Закрытие сворачивает в трей; полный выход завершает звонок. Без подписи издателя.</p><a class="download" href="https://github.com/LChatDev/LChat/releases/download/clients-2026.11.20/LChat-1.0.0-Windows-x64.exe">Скачать EXE</a></section>
     <section class="versions" aria-labelledby="versions-title">
       <div class="section-heading"><div><span class="eyebrow">ИСТОРИЯ ВЕРСИЙ</span><h2 id="versions-title">Доступные сборки</h2></div><span><?= count($versions) ?> версий</span></div>
       <?php foreach ($versions as $index => $item): ?>

@@ -1,0 +1,18 @@
+{
+  "name": "lchat-desktop",
+  "version": "1.0.0",
+  "description": "LChat desktop client",
+  "author": "LChatDev",
+  "license": "GPL-3.0-only",
+  "main": "main.cjs",
+  "scripts": { "start": "electron .", "test": "node --test policy.test.cjs", "build": "electron-builder --win portable --x64" },
+  "devDependencies": { "electron": "45.4.1", "electron-builder": "26.18.0" },
+  "build": {
+    "appId": "su.lbs.lchat.desktop",
+    "productName": "LChat",
+    "files": ["main.cjs", "policy.cjs", "icon.png", "package.json"],
+    "directories": { "output": "dist" },
+    "win": { "target": "portable", "signAndEditExecutable": false },
+    "portable": { "artifactName": "LChat-${version}-Windows-x64.exe" }
+  }
+}

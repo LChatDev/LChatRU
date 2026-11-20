@@ -1,0 +1,8 @@
+/build/
+/signing/
+/sdk/
+/local.properties
+*.apk
+*.apk.idsig
+*.apk.sha256
+/scrpy/
