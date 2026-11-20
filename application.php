@@ -5,12 +5,21 @@ header('X-Content-Type-Options: nosniff');
 
 $versions = [
     [
+        'version' => '2.2.2',
+        'date' => '2026-11-20',
+        'size' => '22.7 MB',
+        'sha256' => '13db5337dde2e54ce4f1d39883feb3fafb0324a9d417090bd1098b61bdf7ff81',
+        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.2.2/LChat-2.2.2-universal.apk',
+        'latest' => true,
+        'changes' => ['WebRTC 150.7871.08 и обновлённое подключение аудио.','Расширенная диагностика. Сборка для проверки звонков на устройстве.'],
+    ],
+    [
         'version' => '2.2.1',
         'date' => '2026-11-20',
         'size' => '22.7 MB',
         'sha256' => '1467890018f2fe83009a36410b95fd01d10d80af26411806ddf5265e188c105f',
         'file' => 'https://github.com/LChatDev/LChat/releases/download/clients-2026.11.20/LChat-2.2.1-universal.apk',
-        'latest' => true,
+        'latest' => false,
         'changes' => ['Принятие соглашения и инструкция подтверждения email.','Восстановление пароля с экрана входа.'],
     ],
     [

@@ -9,7 +9,7 @@ root.mkdir(exist_ok=True)
 packages = [
     ('platform', 'https://dl.google.com/android/repository/platform-35_r02.zip', '0bb560a90a7a2cbd0dd8348224d518b638fe7949'),
     ('build-tools', 'https://dl.google.com/android/repository/build-tools_r35_windows.zip', 'af059bb67cf7786f45ee0db85e2d24985df1b4b6'),
-    ('webrtc', 'https://repo.maven.apache.org/maven2/io/github/webrtc-sdk/android/150.7871.01/android-150.7871.01.aar', None),
+    ('webrtc-150.7871.08', 'https://repo.maven.apache.org/maven2/io/github/webrtc-sdk/android/150.7871.08/android-150.7871.08.aar', None),
 ]
 for name, url, sha1 in packages:
     archive = root / (name + '.zip')

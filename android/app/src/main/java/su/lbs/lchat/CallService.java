@@ -202,7 +202,7 @@ public final class CallService extends Service {
             focus=new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).setAudioAttributes(attributes).setOnAudioFocusChangeListener(change->{if(change==AudioManager.AUDIOFOCUS_LOSS)submit(()->stopCall("Аудио используется другим приложением"));}).build();
             if(audio.requestAudioFocus(focus)!=AudioManager.AUDIOFOCUS_REQUEST_GRANTED)throw new IOException("Microphone audio focus unavailable");
             wake=getSystemService(PowerManager.class).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"LChat:Call");wake.acquire(7*60*60*1000L);
-            CallDiagnostics.event("WEBRTC_INITIALIZE");PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions.builder(getApplicationContext()).createInitializationOptions());
+            CallDiagnostics.event("WEBRTC_INITIALIZE_150_7871_08");PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions.builder(getApplicationContext()).createInitializationOptions());
             audioDevice=createAudioDevice();
             factory=PeerConnectionFactory.builder().setAudioDeviceModule(audioDevice).createPeerConnectionFactory();
             audioSource=factory.createAudioSource(new MediaConstraints());audioTrack=factory.createAudioTrack("lchat_audio",audioSource);audioTrack.setEnabled(!muted);
@@ -224,10 +224,11 @@ public final class CallService extends Service {
             JSONArray signals=data.getJSONArray("signals");for(int i=0;i<signals.length();i++){JSONObject signal=signals.getJSONObject(i);Peer p=peers.get(signal.getString("sender"));if(p!=null)handleSignal(p,signal.getJSONObject("payload"));after=Math.max(after,signal.getLong("id"));}
             StringBuilder participants=new StringBuilder();for(int k=0;k<list.length();k++){JSONObject info=list.getJSONObject(k);Peer peer=peers.get(info.optString("id"));if(participants.length()>0)participants.append('\n');participants.append(info.optString("name")).append(info.optInt("muted")==1?" · микрофон выключен":"").append(peer!=null&&peer.connected?" · на связи":" · подключается");}participantSummary=participants.toString();
             long connected=peers.values().stream().filter(p->p.connected).count();publish("В звонке: "+(peers.size()+1)+" · На связи: "+connected+(incomingName.isEmpty()?"":" · Входящий: "+incomingName));
-        }catch(Exception e){failures++;if(e instanceof ApiError&&Arrays.asList(401,403,404,410).contains(((ApiError)e).code)){stopCall(e.getMessage());return;}publish("Восстанавливаем связь с сервером…");if(failures>15){stopCall("Сеть недоступна. Войдите в звонок заново.");return;}}
+        }catch(Exception e){CallDiagnostics.event("CALL_POLL_FAILED",e);failures++;if(e instanceof ApiError&&Arrays.asList(401,403,404,410).contains(((ApiError)e).code)){stopCall(e.getMessage());return;}publish("Восстанавливаем связь с сервером…");if(failures>15){stopCall("Сеть недоступна. Войдите в звонок заново.");return;}}
         if(!stopping&&!cancelRequested)loop.schedule(this::poll,failures>0?3000:1000,TimeUnit.MILLISECONDS);
     }
     private Peer createPeer(String pid,String name){
+        CallDiagnostics.event("PEER_CREATE_BEGIN");
         Peer p=new Peer();p.id=pid;p.name=name;
         PeerConnection.RTCConfiguration config=new PeerConnection.RTCConfiguration(ice);config.sdpSemantics=PeerConnection.SdpSemantics.UNIFIED_PLAN;config.iceTransportsType=transport;
         p.pc=factory.createPeerConnection(config,new PeerConnection.Observer(){
@@ -244,10 +245,16 @@ public final class CallService extends Service {
             // Remote audio tracks are enabled by default. Do not access JNI wrappers
             // on this callback thread while the signalling thread may replace them.
             @Override public void onTrack(RtpTransceiver t){CallDiagnostics.event("REMOTE_AUDIO_TRACK");}
-            @Override public void onConnectionChange(PeerConnection.PeerConnectionState state){submit(()->{if(!live(p))return;p.connected=state==PeerConnection.PeerConnectionState.CONNECTED;if(p.connected){CallDiagnostics.event("PEER_CONNECTED");p.restarts=0;if(p.retry!=null)p.retry.cancel(false);p.retry=null;}else if(state==PeerConnection.PeerConnectionState.FAILED||state==PeerConnection.PeerConnectionState.DISCONNECTED)recover(p);});}
+            @Override public void onConnectionChange(PeerConnection.PeerConnectionState state){submit(()->{if(!live(p))return;CallDiagnostics.event("PEER_STATE_"+state.name());p.connected=state==PeerConnection.PeerConnectionState.CONNECTED;if(p.connected){CallDiagnostics.event("PEER_CONNECTED");p.restarts=0;if(p.retry!=null)p.retry.cancel(false);p.retry=null;}else if(state==PeerConnection.PeerConnectionState.FAILED||state==PeerConnection.PeerConnectionState.DISCONNECTED)recover(p);});}
         });
         if(p.pc==null)throw new IllegalStateException("Cannot create peer connection");
-        if(id.compareTo(pid)<0)p.pc.addTransceiver(audioTrack,new RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_RECV,Collections.singletonList("lchat")));
+        CallDiagnostics.event("PEER_CREATE_READY");
+        // Use the standard unified-plan addTrack path on both sides. WebRTC
+        // associates the audio sender with the offered audio m-line itself.
+        // Do not retain or mutate JNI transceiver wrappers during negotiation.
+        CallDiagnostics.event("AUDIO_ATTACH_BEGIN");
+        if(p.pc.addTrack(audioTrack,Collections.singletonList("lchat"))==null)throw new IllegalStateException("Cannot attach audio track");
+        CallDiagnostics.event("AUDIO_ATTACH_READY");
         recover(p);return p;
     }
     private void offer(Peer p,boolean restart){
@@ -258,6 +265,7 @@ public final class CallService extends Service {
     }
     private void localDescription(Peer p,SessionDescription s){
         if(!live(p))return;
+        CallDiagnostics.event("LOCAL_SDP_"+s.type.canonicalForm().toUpperCase(Locale.ROOT));
         p.pc.setLocalDescription(new Sdp(){@Override public void onSetSuccess(){submit(()->{if(!live(p))return;p.negotiating=false;p.offered=true;send(p,object("type",s.type.canonicalForm(),"sdp",s.description));});}@Override public void onSetFailure(String e){submit(()->{p.negotiating=false;recover(p);});}},s);
     }
     private void handleSignal(Peer p,JSONObject message)throws JSONException{
@@ -269,14 +277,12 @@ public final class CallService extends Service {
         if("offer".equals(type)&&id.compareTo(p.id)<0)return;
         if("answer".equals(type)&&p.pc.signalingState()!=PeerConnection.SignalingState.HAVE_LOCAL_OFFER)return;
         SessionDescription description=new SessionDescription(SessionDescription.Type.fromCanonicalForm(type),message.getString("sdp"));
+        CallDiagnostics.event("REMOTE_SDP_"+type.toUpperCase(Locale.ROOT));
         p.pc.setRemoteDescription(new Sdp(){@Override public void onSetSuccess(){submit(()->{
             if(!live(p))return;
+            CallDiagnostics.event("REMOTE_SDP_READY");
             for(IceCandidate c:p.candidates)p.pc.addIceCandidate(c);p.candidates.clear();
             if("offer".equals(type)){
-                for(RtpTransceiver t:p.pc.getTransceivers()){
-                    if(t.getMediaType()==MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO){t.setDirection(RtpTransceiver.RtpTransceiverDirection.SEND_RECV);t.getSender().setTrack(audioTrack,false);t.getSender().setStreams(Collections.singletonList("lchat"));}
-                    else t.setDirection(RtpTransceiver.RtpTransceiverDirection.INACTIVE);
-                }
                 p.pc.createAnswer(new Sdp(){@Override public void onCreateSuccess(SessionDescription s){submit(()->localDescription(p,s));}@Override public void onCreateFailure(String e){submit(()->recover(p));}},new MediaConstraints());
             }
         });}@Override public void onSetFailure(String e){submit(()->recover(p));}},description);
