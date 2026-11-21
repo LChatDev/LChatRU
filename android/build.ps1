@@ -25,6 +25,7 @@ $sources=@(Get-ChildItem (Join-Path $root 'app/src/main/java') -Recurse -Filter 
 & (Join-Path $JavaHome 'bin/javac.exe') --release 8 -encoding UTF-8 -classpath "$AndroidJar;$classesJar" -d (Join-Path $work 'classes') @sources;Check-Exit
 & (Join-Path $JavaHome 'bin/jar.exe') cf (Join-Path $work 'app.jar') -C (Join-Path $work 'classes') .;Check-Exit
 & (Join-Path $JavaHome 'bin/java.exe') -cp (Join-Path $BuildTools 'lib/d8.jar') com.android.tools.r8.D8 --release --min-api $minSdk --lib $AndroidJar --output (Join-Path $work 'dex') (Join-Path $work 'app.jar') $classesJar;Check-Exit
+Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $archive=[IO.Compression.ZipFile]::Open((Join-Path $work 'base.apk'),[IO.Compression.ZipArchiveMode]::Update)
 try{

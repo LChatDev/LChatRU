@@ -1,4 +1,14 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="48dp" android:height="48dp" android:viewportWidth="48" android:viewportHeight="48">
-  <path android:fillColor="#3390EC" android:pathData="M24,0 A24,24 0,1 1,24 48 A24,24 0,1 1,24 0" />
-  <path android:fillColor="#FFFFFF" android:pathData="M15,12 L21,12 L21,31 L34,31 L34,37 L15,37 Z" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Pixel cobalt plate -->
+    <path android:fillColor="#0638C8"
+        android:pathData="M4,0h40v4h4v40h-4v4H4v-4H0V4h4z"/>
+    <!-- Pixel speech bubble -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M10,10h28v4h4v16h-4v4H22v4h-4v-4h-4v-4H10v-4H6V14h4z"/>
+    <path android:fillColor="#0638C8"
+        android:pathData="M14,18h4v4h-4zM22,18h4v4h-4zM30,18h4v4h-4z"/>
 </vector>

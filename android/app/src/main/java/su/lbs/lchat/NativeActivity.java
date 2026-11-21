@@ -26,15 +26,15 @@ public final class NativeActivity extends Activity {
  LinearLayout root,body,list,callCard,bubbles,replyKeyboardPanel; ScrollView scroll; EditText composer; TextView error; Button join,replyKeyboardToggle; JSONObject activeReplyKeyboard; int replyKeyboardMessageId; boolean replyKeyboardCollapsed;
  String pendingBody="",pendingNonce=""; boolean sending=false,recordPending=false; String search=""; String screen="",filter="",pendingToken,endpoint="api.php"; boolean alive=true,resumed=false,polling=false,permission=false,listen=false,adminChat=false;
  int generation=0,chatId=0,pickerChat=0; MediaRecorder recorder; MediaPlayer player; File recording; long recordStart; AlertDialog recordDialog;
- static final int BG=0xff0e1621,CARD=0xff17212b,INK=0xfff5f5f5,ACCENT=0xff6ab3f3;
+ static final int BG=0xff070c26,CARD=0xff0a1030,INK=0xffe9eeff,ACCENT=0xff638dff;
  interface Job {JSONObject run()throws Exception;} interface Result {void done(JSONObject d);} interface Value {void done(String s);} interface Choice {void done(JSONObject u);}
  final Runnable tick=new Runnable(){public void run(){if(!alive||!resumed)return;showCall();if(user!=null&&(screen.equals("home")||screen.equals("chat")))refresh(false);handler.postDelayed(this,3000);}};
  @Override public void onCreate(Bundle b){super.onCreate(b);CallDiagnostics.install(this);getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);api=new NativeApi(getSharedPreferences("lchat",0).getString("site","https://chat.lbs.su/"));CallClient.connect(this,api);shell("LChat");add(body,label("Подключаемся…",16));add(body,button("Войти вручную",()->auth(false)));job(()->api.get("me"),d->{user=d.optJSONObject("user");if(user==null)auth(false);else{home();startInbox();handle(getIntent());}});}
  int dp(int x){return (int)(x*getResources().getDisplayMetrics().density);}
- GradientDrawable bg(int c){GradientDrawable d=new GradientDrawable();d.setColor(c);d.setCornerRadius(dp(20));return d;}
+ GradientDrawable bg(int c){GradientDrawable d=new GradientDrawable();d.setColor(c);d.setCornerRadius(dp(6));return d;}
  TextView label(String s,int size){TextView t=new TextView(this);t.setText(s);t.setTextColor(INK);t.setTextSize(size);t.setPadding(dp(12),dp(7),dp(12),dp(7));return t;}
- Button button(String s,Runnable run){Button b=new Button(this);b.setText(s);b.setTextColor(ACCENT);b.setAllCaps(false);b.setBackground(ui.touch(CARD,12));b.setOnClickListener(v->run.run());return b;}
- EditText input(String hint){EditText e=new EditText(this);e.setHint(hint);e.setTextColor(INK);e.setHintTextColor(0xff9baec7);e.setPadding(dp(14),dp(10),dp(14),dp(10));e.setBackground(bg(CARD));return e;}
+ Button button(String s,Runnable run){Button b=new Button(this);b.setText(s);b.setTextColor(ACCENT);b.setAllCaps(false);b.setBackground(ui.touch(CARD,6));b.setOnClickListener(v->run.run());return b;}
+ EditText input(String hint){EditText e=new EditText(this);e.setHint(hint);e.setTextColor(INK);e.setHintTextColor(0xff97a3ce);e.setPadding(dp(14),dp(10),dp(14),dp(10));e.setBackground(bg(CARD));return e;}
  void add(LinearLayout l,View v){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(dp(5),dp(5),dp(5),dp(5));l.addView(v,p);}
  void shell(String title){ui.shell(title);}
  void job(Job job,Result result){int g=generation;worker.execute(()->{if(!alive||g!=generation)return;try{JSONObject d=job.run();handler.post(()->{if(alive&&g==generation){error.setVisibility(View.GONE);result.done(d);}});}catch(Exception e){handler.post(()->{if(alive&&g==generation){if(e instanceof MobileApi.Error&&((MobileApi.Error)e).code==401&&user!=null){user=null;stopService(new Intent(this,InboxService.class));auth(false);}error.setText(e.getMessage());error.setVisibility(View.VISIBLE);}});}});}
@@ -48,6 +48,7 @@ public final class NativeActivity extends Activity {
   CheckBox consent=new CheckBox(this);consent.setText("Я принимаю пользовательское соглашение и ознакомлен с политикой конфиденциальности");consent.setTextColor(INK);
   if(register){add(form,consent);add(form,button("Соглашение и конфиденциальность",()->startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(api.base+"legal.php")))));}
   Button submit=button(register?"Зарегистрироваться":"Войти",()->{});
+  submit.setBackground(ui.touch(ACCENT,6));submit.setTextColor(-1);
   submit.setOnClickListener(v->{
    if(register&&!consent.isChecked()){toast("Примите соглашение и ознакомьтесь с политикой конфиденциальности");return;}
    submit.setEnabled(false);
@@ -64,7 +65,7 @@ public final class NativeActivity extends Activity {
  void home(){ui.home();}
  void renderChats(){ui.renderChats();}
  void avatar(LinearLayout row,String title,int id){
-  FrameLayout frame=new FrameLayout(this);frame.setBackground(ui.shape(new int[]{0xff5288c1,0xff7b6bc9,0xff4a9c89,0xffb77c59}[Math.floorMod(title.hashCode(),4)],30));frame.setClipToOutline(true);
+  FrameLayout frame=new FrameLayout(this);frame.setBackground(ui.shape(new int[]{0xff286db5,0xff853eba,0xff2c8e47,0xffd56529}[Math.floorMod(title.hashCode(),4)],6));frame.setClipToOutline(true);
   TextView initials=label(title.isEmpty()?"?":title.substring(0,1).toUpperCase(Locale.ROOT),24);initials.setGravity(Gravity.CENTER);initials.setTextColor(-1);frame.addView(initials,new FrameLayout.LayoutParams(-1,-1));
   ImageView image=new ImageView(this);image.setScaleType(ImageView.ScaleType.CENTER_CROP);frame.addView(image,new FrameLayout.LayoutParams(-1,-1));row.addView(frame,new LinearLayout.LayoutParams(dp(54),dp(54)));
   if(id<=0||noAvatar.contains(id))return;if(avatars.containsKey(id)){image.setImageBitmap(avatars.get(id));return;}

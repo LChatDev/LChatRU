@@ -15,7 +15,8 @@ import java.util.*;
 /** Native messenger layout. Views never own the call or its microphone. */
 final class ChatUi {
     final NativeActivity a;
-    static final int SURFACE=0xff17212b, BACKGROUND=0xff0e1621, TEXT=0xfff5f5f5, MUTED=0xff7f91a4, BLUE=0xff6ab3f3, OUT=0xff2b5278;
+    /* Pixel theme tokens aligned with the web pixel skin. */
+    static final int SURFACE=0xff0a1030, BACKGROUND=0xff070c26, TEXT=0xffe9eeff, MUTED=0xff97a3ce, BLUE=0xff638dff, OUT=0xff0638c8, COBALT=0xff0638c8;
     LinearLayout toolbar, reply;
     TextView subtitle;
     int replyId;
@@ -55,7 +56,7 @@ final class ChatUi {
         LinearLayout strip=new LinearLayout(a);strip.setBackgroundColor(SURFACE);tabs.clear();String[] names={"Все чаты","Группы","Каналы"},kinds={"","group","channel"};
         for(int i=0;i<3;i++){String k=kinds[i];Button b=a.button(names[i],()->{a.filter=k;lastChats="";renderChats();});b.setTag(k);b.setTextSize(14);b.setBackground(touch(SURFACE,0));tabs.add(b);strip.addView(b,new LinearLayout.LayoutParams(0,dp(48),1));}a.body.addView(strip);
         FrameLayout frame=new FrameLayout(a);ScrollView scroll=new ScrollView(a);scroll.setFillViewport(true);a.list=column();scroll.addView(a.list);frame.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
-        View compose=icon("compose","Новый чат",a::create);compose.setBackground(touch(0xff5288c1,30));FrameLayout.LayoutParams fab=new FrameLayout.LayoutParams(dp(56),dp(56),Gravity.END|Gravity.BOTTOM);fab.setMargins(0,0,dp(20),dp(20));compose.setElevation(dp(6));frame.addView(compose,fab);a.body.addView(frame,new LinearLayout.LayoutParams(-1,0,1));renderChats();a.refresh(false);
+        View compose=icon("compose","Новый чат",a::create);compose.setBackground(touch(COBALT,6));FrameLayout.LayoutParams fab=new FrameLayout.LayoutParams(dp(56),dp(56),Gravity.END|Gravity.BOTTOM);fab.setMargins(0,0,dp(20),dp(20));compose.setElevation(dp(4));frame.addView(compose,fab);a.body.addView(frame,new LinearLayout.LayoutParams(-1,0,1));renderChats();a.refresh(false);
     }
     void renderChats(){
         if(!a.screen.equals("home")||a.list==null)return;
@@ -66,15 +67,15 @@ final class ChatUi {
             LinearLayout row=new LinearLayout(a);row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(12),dp(9),dp(12),dp(9));row.setBackground(touch(SURFACE,0));a.avatar(row,title,c.optJSONObject("peer")==null?0:c.optJSONObject("peer").optInt("id"));
             LinearLayout lines=column();lines.setPadding(dp(12),0,dp(8),0);TextView name=text((kind.equals("channel")?"▸ ":kind.equals("group")?"◈ ":"")+title,16,TEXT);name.setTypeface(null,Typeface.BOLD);name.setSingleLine(true);name.setEllipsize(TextUtils.TruncateAt.END);lines.addView(name);space(lines,6);
             String preview=c.optString("last_message","");TextView snippet=text(preview.equals("null")||preview.isEmpty()?"Начните разговор":preview,15,MUTED);snippet.setSingleLine(true);snippet.setEllipsize(TextUtils.TruncateAt.END);lines.addView(snippet);row.addView(lines,new LinearLayout.LayoutParams(0,-2,1));
-            LinearLayout right=column();right.setGravity(Gravity.END);right.addView(text(time(c.optString("last_message_at")),12,MUTED));int unread=c.optInt("unread");if(unread>0){space(right,7);TextView badge=text(unread>99?"99+":""+unread,12,TEXT);badge.setGravity(Gravity.CENTER);badge.setPadding(dp(7),dp(3),dp(7),dp(3));badge.setBackground(shape(0xff5288c1,12));right.addView(badge);}row.addView(right);row.setOnClickListener(v->a.open(c,false));a.list.addView(row,lp(-1,76));
-            View divider=new View(a);divider.setBackgroundColor(0x10ffffff);LinearLayout.LayoutParams d=lp(-1,1);d.leftMargin=dp(78);a.list.addView(divider,d);
+            LinearLayout right=column();right.setGravity(Gravity.END);right.addView(text(time(c.optString("last_message_at")),12,MUTED));int unread=c.optInt("unread");if(unread>0){space(right,7);TextView badge=text(unread>99?"99+":""+unread,12,TEXT);badge.setGravity(Gravity.CENTER);badge.setPadding(dp(7),dp(3),dp(7),dp(3));badge.setBackground(shape(COBALT,4));right.addView(badge);}row.addView(right);row.setOnClickListener(v->a.open(c,false));a.list.addView(row,lp(-1,70));
+            View divider=new View(a);divider.setBackgroundColor(0xff19224f);LinearLayout.LayoutParams d=lp(-1,1);d.leftMargin=dp(78);a.list.addView(divider,d);
         }
         if(a.list.getChildCount()==0){TextView empty=text(a.search.isEmpty()?"Здесь появятся ваши разговоры":"Ничего не найдено",16,MUTED);empty.setGravity(Gravity.CENTER);empty.setPadding(dp(24),dp(70),dp(24),dp(24));a.list.addView(empty);}
         space(a.list,80);
     }
     void open(JSONObject c,boolean admin){
         a.cancelRecording();a.stopPlayer();a.pendingBody="";a.pendingNonce="";a.screen="chat";a.chat=c;a.chatId=c.optInt("id");a.adminChat=admin;a.messages.clear();a.room=null;a.activeReplyKeyboard=null;a.replyKeyboardMessageId=0;a.replyKeyboardCollapsed=false;a.replyKeyboardPanel=null;a.replyKeyboardToggle=null;a.composer=null;replyId=0;forceScroll=true;historyScroll=false;
-        shell(c.optString("title","Чат"));a.join=a.button("В группе идёт звонок · Присоединиться",()->{if(a.room!=null)a.call(a.room.optString("token"),"api.php",false);});a.join.setBackground(touch(0xff286c88,0));a.join.setTextColor(-1);a.join.setVisibility(View.GONE);a.body.addView(a.join,lp(-1,44));
+        shell(c.optString("title","Чат"));a.join=a.button("В группе идёт звонок · Присоединиться",()->{if(a.room!=null)a.call(a.room.optString("token"),"api.php",false);});a.join.setBackground(touch(COBALT,0));a.join.setTextColor(-1);a.join.setVisibility(View.GONE);a.body.addView(a.join,lp(-1,44));
         a.scroll=new ScrollView(a);a.scroll.setFillViewport(true);a.scroll.setBackground(new Wallpaper());a.bubbles=column();a.bubbles.setGravity(Gravity.BOTTOM);a.bubbles.setPadding(dp(8),dp(10),dp(8),dp(10));a.scroll.addView(a.bubbles);a.body.addView(a.scroll,new LinearLayout.LayoutParams(-1,0,1));
         boolean canWrite=admin||!c.optString("kind").equals("channel")||c.optInt("owner_id")==a.user.optInt("id");
         if(canWrite){
@@ -94,17 +95,17 @@ final class ChatUi {
         if(!a.messages.isEmpty()&&!a.adminChat)a.add(a.bubbles,a.button("Предыдущие сообщения",()->{int id=a.chatId,before=a.messages.firstKey();a.job(()->a.api.get("messages&chat_id="+id+"&before="+before),d->{JSONArray rows=d.optJSONArray("messages");if(rows!=null)for(int n=0;n<rows.length();n++){JSONObject m=rows.optJSONObject(n);a.messages.put(m.optInt("id"),m);}historyScroll=true;renderMessages();});}));
         String previousDay="";
         for(JSONObject m:a.messages.values()){
-            String date=m.optString("created_at"),day=date.length()>=10?date.substring(0,10):"";if(!day.equals(previousDay)){TextView stamp=text(day,12,TEXT);stamp.setPadding(dp(10),dp(4),dp(10),dp(4));stamp.setBackground(shape(0x80445566,12));LinearLayout.LayoutParams p=lp(-2,-2);p.gravity=Gravity.CENTER;p.setMargins(0,dp(10),0,dp(8));a.bubbles.addView(stamp,p);previousDay=day;}
-            boolean own=m.optInt("user_id")==a.user.optInt("id");LinearLayout bubble=column();bubble.setPadding(dp(10),dp(6),dp(10),dp(5));bubble.setBackground(shape(own?OUT:SURFACE,13));
+            String date=m.optString("created_at"),day=date.length()>=10?date.substring(0,10):"";if(!day.equals(previousDay)){TextView stamp=text(day,12,TEXT);stamp.setPadding(dp(10),dp(4),dp(10),dp(4));stamp.setBackground(shape(COBALT,6));LinearLayout.LayoutParams p=lp(-2,-2);p.gravity=Gravity.CENTER;p.setMargins(0,dp(10),0,dp(8));a.bubbles.addView(stamp,p);previousDay=day;}
+            boolean own=m.optInt("user_id")==a.user.optInt("id");LinearLayout bubble=column();bubble.setPadding(dp(10),dp(6),dp(10),dp(5));bubble.setBackground(shape(own?OUT:0xff131b44,own?6:8));
             if(!own&&a.chat.optString("kind").equals("group")||m.optInt("moderator")>0){TextView name=text(m.optString("name")+(m.optInt("moderator")>0?" · администратор":""),13,BLUE);name.setTypeface(null,Typeface.BOLD);bubble.addView(name);space(bubble,4);}
-            if(m.optInt("reply_to_id")>0){TextView quote=text(m.optString("reply_name")+"\n"+m.optString("reply_body"),13,BLUE);quote.setMaxLines(3);quote.setEllipsize(TextUtils.TruncateAt.END);quote.setPadding(dp(8),dp(5),dp(8),dp(5));quote.setBackground(shape(0x206ab3f3,4));bubble.addView(quote);space(bubble,5);}
+            if(m.optInt("reply_to_id")>0){TextView quote=text(m.optString("reply_name")+"\n"+m.optString("reply_body"),13,BLUE);quote.setMaxLines(3);quote.setEllipsize(TextUtils.TruncateAt.END);quote.setPadding(dp(8),dp(5),dp(8),dp(5));quote.setBackground(shape(0x20638dff,3));bubble.addView(quote);space(bubble,5);}
             if(m.optInt("voice_duration")>0){Button voice=a.button("▶  Голосовое сообщение  ·  "+m.optInt("voice_duration")+" с",()->a.play(a.api.base+"download.php?play=1&id="+m.optInt("id")));bubble.addView(voice);}
             else{String full=m.optString("body");TextView message=text(full.length()>8192?full.substring(0,8192)+"…":full,16,TEXT);message.setMaxWidth(dp(480));message.setAutoLinkMask(android.text.util.Linkify.WEB_URLS);message.setLinkTextColor(BLUE);bubble.addView(message);if(full.length()>8192)bubble.addView(a.button("Читать далее",()->a.showLongTextPage(full,0)));}
             if(!m.isNull("file_name")&&m.optInt("voice_duration")==0)bubble.addView(a.button("↓  "+m.optString("file_name"),()->a.download(m)));
             if(!m.isNull("invite_token"))bubble.addView(a.button("Открыть приглашение",()->a.joinInvite(m.optString("invite_kind"),m.optString("invite_token"))));
             if(!m.isNull("event_token")&&a.room!=null&&m.optString("event_token").equals(a.room.optString("token")))bubble.addView(a.button("Присоединиться к звонку",()->a.call(m.optString("event_token"),"api.php",false)));
             a.renderInlineButtons(bubble,m);JSONArray reactions=m.optJSONArray("reactions");if(reactions!=null&&reactions.length()>0){LinearLayout strip=new LinearLayout(a);for(int i=0;i<reactions.length();i++){JSONObject r=reactions.optJSONObject(i);Button chip=a.button(r.optString("emoji")+" "+r.optInt("count"),()->react(m,r.optString("emoji")));strip.addView(chip,lp(-2,36));}bubble.addView(strip);}
-            TextView meta=text((m.isNull("edited_at")?"":"изменено · ")+time(date)+(own?"  ✓":""),11,own?0xffa5c6e5:MUTED);meta.setGravity(Gravity.END);bubble.addView(meta);
+            TextView meta=text((m.isNull("edited_at")?"":"изменено · ")+time(date)+(own?"  ✓":""),11,own?0xffc5d6ff:MUTED);meta.setGravity(Gravity.END);bubble.addView(meta);
             bubble.setOnLongClickListener(v->{a.menu(m);return true;});LinearLayout.LayoutParams p=lp(-2,-2);p.gravity=own?Gravity.END:Gravity.START;p.setMargins(dp(own?42:0),dp(2),dp(own?0:42),dp(2));a.bubbles.addView(bubble,p);
         }
         final boolean history=historyScroll;historyScroll=false;forceScroll=false;a.scroll.post(()->{if(history)a.scroll.scrollTo(0,oldY+Math.max(0,a.bubbles.getHeight()-oldHeight));else if(bottom)a.scroll.fullScroll(View.FOCUS_DOWN);else a.scroll.scrollTo(0,oldY);});
@@ -130,20 +131,33 @@ final class ChatUi {
     }
     void showCall(){
         if(a.callCard==null)return;boolean active=CallService.active||CallService.launching;String signature=active+"|"+CallService.status+"|"+CallService.displayName+"|"+CallService.muted+"|"+CallService.speaker;
-        if(!signature.equals(lastCall)){lastCall=signature;a.callCard.removeAllViews();if(active){LinearLayout row=new LinearLayout(a);row.setGravity(Gravity.CENTER_VERTICAL);row.setBackgroundColor(0xff286c88);row.addView(icon("phone","Открыть звонок",this::openCall));TextView title=text(CallService.displayName+"\n"+CallService.status,13,-1);title.setMaxLines(2);row.addView(title,new LinearLayout.LayoutParams(0,-2,1));row.addView(icon("close","Завершить звонок",()->a.command("end")));row.setOnClickListener(v->openCall());a.callCard.addView(row,lp(-1,56));}else if(!CallService.status.isEmpty()&&!CallService.status.equals("Звонок завершён")){TextView status=text(CallService.status,13,MUTED);status.setPadding(dp(16),dp(8),dp(16),dp(8));a.callCard.addView(status);}}
+        if(!signature.equals(lastCall)){lastCall=signature;a.callCard.removeAllViews();if(active){LinearLayout row=new LinearLayout(a);row.setGravity(Gravity.CENTER_VERTICAL);row.setBackgroundColor(COBALT);row.addView(icon("phone","Открыть звонок",this::openCall));TextView title=text(CallService.displayName+"\n"+CallService.status,13,-1);title.setMaxLines(2);row.addView(title,new LinearLayout.LayoutParams(0,-2,1));row.addView(icon("close","Завершить звонок",()->a.command("end")));row.setOnClickListener(v->openCall());a.callCard.addView(row,lp(-1,56));}else if(!CallService.status.isEmpty()&&!CallService.status.equals("Звонок завершён")){TextView status=text(CallService.status,13,MUTED);status.setPadding(dp(16),dp(8),dp(16),dp(8));a.callCard.addView(status);}}
         if(callDialog!=null&&callDialog.isShowing()){callName.setText(CallService.displayName);callStatus.setText(CallService.status);long seconds=CallService.callStartedMillis>0?Math.max(0,(System.currentTimeMillis()-CallService.callStartedMillis)/1000):0;callClock.setText(active?String.format(Locale.ROOT,"%02d:%02d",seconds/60,seconds%60):"Завершён");mute.setText(CallService.muted?"Включить\nмикрофон":"Выключить\nмикрофон");speaker.setText(CallService.speaker?"Динамик\nвключён":"Динамик");callPeople.setText(CallService.participantSummary+(CallService.adminPresence.isEmpty()?"":"\nАдминистраторы: "+CallService.adminPresence));mute.setEnabled(active);speaker.setEnabled(active);}
     }
     void openCall(){
-        if(callDialog!=null&&callDialog.isShowing())return;LinearLayout page=column();page.setGravity(Gravity.CENTER_HORIZONTAL);page.setPadding(dp(24),dp(24),dp(24),dp(32));page.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{0xff25485e,0xff17212b,0xff121d29}));
-        TextView back=text("⌄  Свернуть",16,BLUE);back.setPadding(0,dp(8),0,dp(20));page.addView(back);space(page,32);TextView initial=text(CallService.displayName.isEmpty()?"L":CallService.displayName.substring(0,1),48,-1);initial.setGravity(Gravity.CENTER);initial.setBackground(shape(0xff5288c1,60));page.addView(initial,lp(112,112));space(page,24);callName=text(CallService.displayName,24,TEXT);callName.setGravity(Gravity.CENTER);page.addView(callName);space(page,12);callStatus=text("",14,0xffbbd6e9);callStatus.setGravity(Gravity.CENTER);page.addView(callStatus);callClock=text("",16,BLUE);callClock.setPadding(0,dp(12),0,dp(12));page.addView(callClock);
+        if(callDialog!=null&&callDialog.isShowing())return;LinearLayout page=column();page.setGravity(Gravity.CENTER_HORIZONTAL);page.setPadding(dp(24),dp(24),dp(24),dp(32));page.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{0xff0e1539,0xff0a1030,0xff070c26}));
+        TextView back=text("⌄  Свернуть",16,BLUE);back.setPadding(0,dp(8),0,dp(20));page.addView(back);space(page,32);TextView initial=text(CallService.displayName.isEmpty()?"L":CallService.displayName.substring(0,1),48,-1);initial.setGravity(Gravity.CENTER);initial.setBackground(shape(COBALT,8));page.addView(initial,lp(112,112));space(page,24);callName=text(CallService.displayName,24,TEXT);callName.setGravity(Gravity.CENTER);page.addView(callName);space(page,12);callStatus=text("",14,0xffc5d6ff);callStatus.setGravity(Gravity.CENTER);page.addView(callStatus);callClock=text("",16,BLUE);callClock.setPadding(0,dp(12),0,dp(12));page.addView(callClock);
         ScrollView participants=new ScrollView(a);callPeople=text("",14,TEXT);callPeople.setGravity(Gravity.CENTER);participants.addView(callPeople);page.addView(participants,new LinearLayout.LayoutParams(-1,0,1));
-        LinearLayout controls=new LinearLayout(a);mute=a.button("Микрофон",()->a.command("mic"));speaker=a.button("Динамик",()->a.command("speaker"));controls.addView(mute,new LinearLayout.LayoutParams(0,dp(64),1));controls.addView(speaker,new LinearLayout.LayoutParams(0,dp(64),1));page.addView(controls,lp(-1,-2));space(page,12);Button retry=a.button("Восстановить соединение",()->a.command("retry"));page.addView(retry,lp(-1,48));space(page,16);Button end=a.button("Завершить звонок",()->{a.command("end");callDialog.dismiss();});end.setBackground(touch(0xffe65161,28));end.setTextColor(-1);page.addView(end,lp(-1,56));
+        LinearLayout controls=new LinearLayout(a);mute=a.button("Микрофон",()->a.command("mic"));speaker=a.button("Динамик",()->a.command("speaker"));controls.addView(mute,new LinearLayout.LayoutParams(0,dp(64),1));controls.addView(speaker,new LinearLayout.LayoutParams(0,dp(64),1));page.addView(controls,lp(-1,-2));space(page,12);Button retry=a.button("Восстановить соединение",()->a.command("retry"));page.addView(retry,lp(-1,48));space(page,16);Button end=a.button("Завершить звонок",()->{a.command("end");callDialog.dismiss();});end.setBackground(touch(0xffc62828,6));end.setTextColor(-1);page.addView(end,lp(-1,56));
         callDialog=new AlertDialog.Builder(a).setView(page).create();back.setOnClickListener(v->callDialog.dismiss());callDialog.show();callDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);callDialog.getWindow().setLayout(-1,-1);showCall();
     }
     void destroy(){if(callDialog!=null)callDialog.dismiss();}
     static final class Wallpaper extends Drawable {
         final Paint p=new Paint(3);
-        @Override public void draw(Canvas c){c.drawColor(BACKGROUND);p.setColor(0x0a98b9da);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2);float unit=72*c.getDensity()/160f;if(unit<48)unit=72;for(float y=0;y<getBounds().height();y+=unit)for(float x=0;x<getBounds().width();x+=unit){c.save();c.translate(x+(y/unit%2)*unit/2,y);c.rotate(25);c.drawRoundRect(-9,-9,9,9,5,5,p);c.drawCircle(unit/2,unit/3,4,p);c.restore();}}
+        @Override public void draw(Canvas c){
+            c.drawColor(BACKGROUND);
+            float cell=18f*c.getDensity()/160f; if(cell<12) cell=14;
+            int[] tiles={0x220638c8,0x1419244f,0x18638dff,0x0c97a3ce};
+            int row=0;
+            for(float y=0;y<getBounds().height()+cell;y+=cell,row++){
+                int col=0;
+                for(float x=((row&1)==0?0:cell/2f);x<getBounds().width()+cell;x+=cell,col++){
+                    p.setStyle(Paint.Style.FILL);
+                    p.setColor(tiles[(row+col)&3]);
+                    c.drawRect(x,y,x+cell-1.5f,y+cell-1.5f,p);
+                }
+            }
+        }
         @Override public void setAlpha(int alpha){} @Override public void setColorFilter(ColorFilter f){} @Override public int getOpacity(){return PixelFormat.OPAQUE;}
     }
     static final class Glyph extends View {
