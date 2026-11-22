@@ -11,6 +11,10 @@ $androidNs='http://schemas.android.com/apk/res/android'
 $minSdk=[int]$manifest.manifest.'uses-sdk'.GetAttribute('minSdkVersion',$androidNs)
 $targetSdk=[int]$manifest.manifest.'uses-sdk'.GetAttribute('targetSdkVersion',$androidNs)
 if($minSdk -lt 26 -or $targetSdk -lt $minSdk){throw 'Invalid supported Android SDK range.'}
+$permissions=@($manifest.manifest.'uses-permission' | ForEach-Object {$_.GetAttribute('name',$androidNs)})
+foreach($required in @('android.permission.INTERNET','android.permission.ACCESS_NETWORK_STATE','android.permission.RECORD_AUDIO','android.permission.MODIFY_AUDIO_SETTINGS','android.permission.FOREGROUND_SERVICE','android.permission.FOREGROUND_SERVICE_MICROPHONE')){
+    if($required -notin $permissions){throw "Missing permission required by the native call engine: $required"}
+}
 $abis=@('arm64-v8a','armeabi-v7a','x86','x86_64')
 $work=Join-Path $root ('build/work-'+[DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss'))
 foreach($name in @('classes','generated','dex','assets')){New-Item -ItemType Directory -Path (Join-Path $work $name) -Force | Out-Null}

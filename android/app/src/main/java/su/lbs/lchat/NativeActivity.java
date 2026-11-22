@@ -45,12 +45,12 @@ public final class NativeActivity extends Activity {
   ScrollView sc=new ScrollView(this);LinearLayout form=new LinearLayout(this);form.setOrientation(1);sc.addView(form);body.addView(sc);
   EditText name=input("Имя"),login=input(register?"Имя пользователя":"Логин или email"),email=input("Email"),pass=input("Пароль");pass.setInputType(129);
   if(register)add(form,name);add(form,login);if(register)add(form,email);add(form,pass);
-  CheckBox consent=new CheckBox(this);consent.setText("Я принимаю пользовательское соглашение и ознакомлен с политикой конфиденциальности");consent.setTextColor(INK);
+  CheckBox consent=new CheckBox(this);consent.setText("Я принимаю публичную оферту и ознакомлен с политикой конфиденциальности");consent.setTextColor(INK);
   if(register){add(form,consent);add(form,button("Соглашение и конфиденциальность",()->startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(api.base+"legal.php")))));}
   Button submit=button(register?"Зарегистрироваться":"Войти",()->{});
   submit.setBackground(ui.touch(ACCENT,6));submit.setTextColor(-1);
   submit.setOnClickListener(v->{
-   if(register&&!consent.isChecked()){toast("Примите соглашение и ознакомьтесь с политикой конфиденциальности");return;}
+   if(register&&!consent.isChecked()){toast("Примите оферту и ознакомьтесь с политикой конфиденциальности");return;}
    submit.setEnabled(false);
    JSONObject data=register?NativeApi.json("name",name.getText().toString(),"username",login.getText().toString(),"email",email.getText().toString(),"password",pass.getText().toString(),"accept_terms","1"):NativeApi.json("login",login.getText().toString(),"password",pass.getText().toString());
    job(()->{try{api.get("me");JSONObject result=api.post(register?"register":"login",data);return result.optBoolean("verification_required")?result:api.get("me");}finally{handler.post(()->submit.setEnabled(true));}},d->{

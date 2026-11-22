@@ -6,3 +6,8 @@
 *.apk.idsig
 *.apk.sha256
 /scrpy/
+node_modules/
+/tests/lchat-call-scenario.json
+/tests/private-*.json
+/tests/qa.stop
+/tests/browser-stats.json
