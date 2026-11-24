@@ -5,102 +5,13 @@ header('X-Content-Type-Options: nosniff');
 
 $versions = [
     [
-        'version' => '3.0.0',
-        'date' => '2026-11-22',
-        'size' => '22.7 MB',
-        'sha256' => '868dc3280f85de11fd883e9ea2db1c9250d3bd4d10d6537f015c42f0cb3481ae',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v3.0.0/LChat-3.0.0-universal.apk',
+        'version' => '2.1 (210)',
+        'date' => '2026-11-24',
+        'size' => '484.7 KB',
+        'sha256' => '0f995e3e153f9034c59e74bc115108c152714590bd02b4f9850521dd6a8d18d1',
+        'file' => 'https://data.lbs.su/lchat-apps/LChat.apk',
         'latest' => true,
-        'changes' => ['Native Calls v3: заново разделены аудио, сигнализация и состояние звонка.','Исправлен воспроизведённый вылет Android 12: добавлено разрешение состояния сети.','Проверены аудио через TURN, фон, выключенный экран и повторный разговор.'],
-    ],
-    [
-        'version' => '2.2.3',
-        'date' => '2026-11-21',
-        'size' => '21.9 MB',
-        'sha256' => 'dda7dc696a25790b18150595e49aabecbca95a8688e09355128210dbc47c988a',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.2.3/LChat-2.2.3-universal.apk',
-        'latest' => false,
-        'changes' => ['Пиксельная палитра и обои чата.','Новая иконка и угловатые радиусы интерфейса.'],
-    ],
-    [
-        'version' => '2.2.2',
-        'date' => '2026-11-20',
-        'size' => '22.7 MB',
-        'sha256' => '13db5337dde2e54ce4f1d39883feb3fafb0324a9d417090bd1098b61bdf7ff81',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.2.2/LChat-2.2.2-universal.apk',
-        'latest' => false,
-        'changes' => ['WebRTC 150.7871.08 и обновлённое подключение аудио.','Расширенная диагностика. Сборка для проверки звонков на устройстве.'],
-    ],
-    [
-        'version' => '2.2.1',
-        'date' => '2026-11-20',
-        'size' => '22.7 MB',
-        'sha256' => '1467890018f2fe83009a36410b95fd01d10d80af26411806ddf5265e188c105f',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/clients-2026.11.20/LChat-2.2.1-universal.apk',
-        'latest' => false,
-        'changes' => ['Принятие соглашения и инструкция подтверждения email.','Восстановление пароля с экрана входа.'],
-    ],
-    [
-        'version' => '2.2.0',
-        'date' => '30 октября 2026',
-        'size' => '22,7 МБ',
-        'sha256' => 'aafbe3a5ab22bc02b7fbd0be15a37c679c2b9e549aff2ad58cae3b354e5bb6fb',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.2.0/LChat-2.2.0-universal.apk',
-        'latest' => false,
-        'changes' => [
-            'Нативный интерфейс чатов, групп и каналов в стиле LChat.',
-            'Отдельный сворачиваемый экран звонка и список участников.',
-            'Ответы, реакции, редактирование сообщений и управление сообществами.',
-            'Обновление временных TURN-данных и улучшенное восстановление соединения.',
-        ],
-    ],
-    [
-        'version' => '2.1.0',
-        'date' => '30 октября 2026',
-        'size' => '22,7 МБ',
-        'sha256' => '40a40acb686705a8be0de96b26fa0872cc68a2a94f28ef4ac491d4e0ac4af5c4',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.1.0/LChat-2.1.0-universal.apk',
-        'changes' => ['Текстовые сообщения до 10 МиБ.', 'Постраничное открытие очень длинных сообщений.', 'Диагностика аудиопроцесса звонков.'],
-    ],
-    [
-        'version' => '2.0.9',
-        'date' => '30 октября 2026',
-        'size' => '22,7 МБ',
-        'sha256' => 'a137828c7a920392d0e29de39adfdfa0fe0137effdccb375ffa1901ef68e0259',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.0.9/LChat-2.0.9-universal.apk',
-        'changes' => ['Изменена обработка аудиоэффектов на устройствах Samsung.', 'Расширена диагностика нативных сбоев WebRTC.'],
-    ],
-    [
-        'version' => '2.0.8',
-        'date' => '30 октября 2026',
-        'size' => '22,7 МБ',
-        'sha256' => 'e6e7dd123cd069a95a60dc58dc68b7aa88034e7be730474f18f50ccf4b28040a',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.0.8/LChat-2.0.8-universal.apk',
-        'changes' => ['Добавлена расшифровка аварийного завершения аудиопроцесса.', 'Улучшен диагностический отчёт звонка.'],
-    ],
-    [
-        'version' => '2.0.7',
-        'date' => '30 октября 2026',
-        'size' => '22,7 МБ',
-        'sha256' => 'bfdf0d8cef94fe4082a3d5e31421d2ef1f6b789a56a8d70e6a0c556cba6cb529',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.0.7/LChat-2.0.7-universal.apk',
-        'changes' => ['Стабилизация отдельного аудиопроцесса.', 'Исправление очистки состояния после завершения звонка.'],
-    ],
-    [
-        'version' => '2.0.6',
-        'date' => '30 октября 2026',
-        'size' => '22,7 МБ',
-        'sha256' => '5344c9c5c1c2c65c580e4b6bd3f3cefdd3bee4a0c372877eb036d15122657615',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.0.6/LChat-2.0.6-universal.apk',
-        'changes' => ['Улучшен запуск фоновой аудиослужбы.', 'Добавлено восстановление состояния звонка после перезапуска приложения.'],
-    ],
-    [
-        'version' => '2.0.5',
-        'date' => '30 октября 2026',
-        'size' => '22,7 МБ',
-        'sha256' => 'a479780d64839680bd42f7a891ef293ad0fc6e673b849fa10aea677bfa6d9b85',
-        'file' => 'https://github.com/LChatDev/LChat/releases/download/android-v2.0.5/LChat-2.0.5-universal.apk',
-        'changes' => ['Ранняя версия нативного Android-клиента.', 'Чаты, каналы, голосовые сообщения и интернет-звонки.'],
+        'changes' => ['Файл предоставлен владельцем и загружен без пересборки.','Подпись отличается от прежних сборок: установка поверх них невозможна.'],
     ],
 ];
 ?>
@@ -126,13 +37,12 @@ $versions = [
       <div>
         <span class="eyebrow">ОФИЦИАЛЬНЫЕ СБОРКИ LCHAT</span>
         <h1>Приложение LChat</h1>
-        <p>Нативные чаты, группы, каналы, голосовые сообщения и интернет-звонки. Выберите версию и скачайте APK прямо с этого сайта.</p>
-        <div class="requirements"><span>Android 8.0+</span><span>ARM64 · ARMv7 · x86 · x86_64</span></div>
+        <p>Актуальный APK LChat, предоставленный владельцем проекта. Старые сборки сняты с публикации.</p>
+        <div class="requirements"><span>Android 7.0+</span><span>APK · 2.1 · code 210</span></div>
       </div>
     </section>
 
-<section class="install"><h2>LChat для Windows</h2><p>Windows 10/11 x64. Закрытие сворачивает в трей; полный выход завершает звонок. Без подписи издателя.</p><a class="download" href="https://github.com/LChatDev/LChat/releases/download/clients-2026.11.20/LChat-1.0.0-Windows-x64.exe">Скачать EXE</a></section>
-    <section class="versions" aria-labelledby="versions-title">
+<section class="versions" aria-labelledby="versions-title">
       <div class="section-heading"><div><span class="eyebrow">ИСТОРИЯ ВЕРСИЙ</span><h2 id="versions-title">Доступные сборки</h2></div><span><?= count($versions) ?> версий</span></div>
       <?php foreach ($versions as $index => $item): ?>
         <article class="version-card<?= !empty($item['latest']) ? ' latest' : '' ?>">
@@ -151,8 +61,8 @@ $versions = [
 
     <section class="install">
       <h2>Как установить</h2>
-      <ol><li>Скачайте последнюю версию APK.</li><li>Откройте файл на телефоне.</li><li>Если Android попросит разрешение, разрешите установку из этого источника.</li><li>Установите приложение поверх старой версии — аккаунт и настройки сохранятся.</li></ol>
-      <p>Старые версии оставлены для диагностики. Для обычного использования выбирайте сборку с отметкой «Последняя».</p>
+      <ol><li>Скачайте последнюю версию APK.</li><li>Откройте файл на телефоне.</li><li>Если Android попросит разрешение, разрешите установку из этого источника.</li><li>У этого APK другой ключ подписи. Сохраните нужные локальные данные и удалите старое приложение перед установкой; Android не позволяет обновление с другим ключом.</li></ol>
+      <p>Опубликован только предоставленный APK. Старые сборки больше не доступны для скачивания.</p>
     </section>
   </main>
   <div id="toast" role="status" aria-live="polite" hidden>SHA-256 скопирован</div>

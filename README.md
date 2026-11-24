@@ -1,3 +1,6 @@
+> Current downloads: see [CLIENTS.md](CLIENTS.md). Previous application binaries have been withdrawn. The supplied APK uses a different signing key; old build/test instructions below describe retained source, not this binary.
+> Актуальный APK: см. CLIENTS.md. Старые сборки удалены; подпись APK отличается. Исторические инструкции ниже относятся к сохранённым исходникам.
+
 # LChat RU
 
 <!-- live-sync-20261119 -->

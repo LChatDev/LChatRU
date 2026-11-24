@@ -1,8 +1,11 @@
+> Current downloads: see [CLIENTS.md](../CLIENTS.md). Previous application binaries have been withdrawn. The supplied APK uses a different signing key; old build/test instructions below describe retained source, not this binary.
+> Актуальный APK: см. CLIENTS.md. Старые сборки удалены; подпись APK отличается. Исторические инструкции ниже относятся к сохранённым исходникам.
+
 # LChat for Windows
 
 Windows 10/11 x64 desktop client for https://chat.lbs.su, built with Electron. It displays the current web interface. The Android client uses separate native Java screens.
 
-Download `LChat-1.0.0-Windows-x64.exe` from the [release](https://github.com/LChatDev/LChat/releases/tag/clients-2026.11.20). This is a portable executable; Node.js is not required. The EXE has no publisher signing certificate. Sessions and preferences stay in the Windows user profile. Internet access is required.
+Download `LChat-1.0.0-Windows-x64.exe` from the release (previous binary withdrawn / прежняя сборка удалена). This is a portable executable; Node.js is not required. The EXE has no publisher signing certificate. Sessions and preferences stay in the Windows user profile. Internet access is required.
 
 Closing the window keeps LChat in the system tray. Double-click its icon to reopen it. Use the tray's Exit command to stop the app and any active call. Microphone, camera and notification access require confirmation. No automatic startup is installed. External links require confirmation and open in the browser. Screen sharing is not implemented in this desktop wrapper yet.
 

@@ -1,8 +1,11 @@
+> Current downloads: see [CLIENTS.md](../CLIENTS.md). Previous application binaries have been withdrawn. The supplied APK uses a different signing key; old build/test instructions below describe retained source, not this binary.
+> Актуальный APK: см. CLIENTS.md. Старые сборки удалены; подпись APK отличается. Исторические инструкции ниже относятся к сохранённым исходникам.
+
 # LChat для Android — 3.0.0
 
 Нативные экраны Java и голосовые звонки WebRTC для PHP-сервера LChat. Сервер по умолчанию: https://chat.lbs.su/. Android 8.0+, пакет `su.lbs.lchat`, версия 3.0.0 / код 30. Универсальный APK: ARM64, ARMv7, x86 и x86_64. Пиксельное оформление сохранено.
 
-[Скачать APK](https://github.com/LChatDev/LChat/releases/tag/android-v3.0.0) · [English](README.md) · [Изменения и проверки](RELEASE_3.0.0.md)
+Скачать APK (previous binary withdrawn / прежняя сборка удалена) · [English](README.md) · [Изменения и проверки](RELEASE_3.0.0.md)
 
 Установите поверх предыдущего официального APK: подпись сохранена. Разрешите микрофон и уведомления. Аккаунт приложения «Телефон» не нужен. В манифест добавлено `ACCESS_NETWORK_STATE`: это обычное разрешение, оно выдаётся при установке и предотвращает воспроизведённый вылет монитора сети WebRTC.
 
