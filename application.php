@@ -3,6 +3,7 @@ declare(strict_types=1);
 header('Cache-Control: no-store, max-age=0');
 header('X-Content-Type-Options: nosniff');
 
+$isCustom = ($_GET['branch'] ?? '') === 'userhosts';
 $versions = [
     [
         'version' => '2.1 (210)',
@@ -14,6 +15,16 @@ $versions = [
         'changes' => ['Файл предоставлен владельцем и загружен без пересборки.','Подпись отличается от прежних сборок: установка поверх них невозможна.'],
     ],
 ];
+if ($isCustom) $versions = [[
+    'version' => '1.0-custom (2.1)',
+    'date' => '2026-11-25',
+    'size' => '494.9 KB',
+    'sha256' => '088d7207391acc2b4a85603a717c4a75637064c553b7699c1fb8162f64e4a9b3',
+    'file' => 'https://data.lbs.su/lchat-apps/userhosts/LChatCustom.apk',
+    'latest' => true,
+    'changes' => ['APK для пользовательских серверов LChat, предоставленный владельцем.','Отдельное приложение: можно установить рядом с обычным LChat.'],
+]];
+
 ?>
 <!doctype html>
 <html lang="ru">
@@ -36,12 +47,13 @@ $versions = [
       <div class="app-icon" aria-hidden="true"><span>L</span></div>
       <div>
         <span class="eyebrow">ОФИЦИАЛЬНЫЕ СБОРКИ LCHAT</span>
-        <h1>Приложение LChat</h1>
+        <h1><?= $isCustom ? 'LChat Custom — свой сервер' : 'Приложение LChat' ?></h1>
         <p>Актуальный APK LChat, предоставленный владельцем проекта. Старые сборки сняты с публикации.</p>
-        <div class="requirements"><span>Android 7.0+</span><span>APK · 2.1 · code 210</span></div>
+        <div class="requirements"><span>Android 7.0+</span><span><?= $isCustom ? 'Custom · 1.0 · code 1' : 'LChat · 2.1 · code 210' ?></span></div>
       </div>
     </section>
 
+<nav aria-label="Варианты приложения" style="display:flex;flex-wrap:wrap;gap:12px;margin:24px 0"><a class="download" href="application.php" <?= !$isCustom ? 'aria-current="page"' : '' ?>>Обычная версия</a><a class="download" href="application.php?branch=userhosts" <?= $isCustom ? 'aria-current="page"' : '' ?>>Свой сервер</a></nav>
 <section class="versions" aria-labelledby="versions-title">
       <div class="section-heading"><div><span class="eyebrow">ИСТОРИЯ ВЕРСИЙ</span><h2 id="versions-title">Доступные сборки</h2></div><span><?= count($versions) ?> версий</span></div>
       <?php foreach ($versions as $index => $item): ?>
@@ -61,8 +73,8 @@ $versions = [
 
     <section class="install">
       <h2>Как установить</h2>
-      <ol><li>Скачайте последнюю версию APK.</li><li>Откройте файл на телефоне.</li><li>Если Android попросит разрешение, разрешите установку из этого источника.</li><li>У этого APK другой ключ подписи. Сохраните нужные локальные данные и удалите старое приложение перед установкой; Android не позволяет обновление с другим ключом.</li></ol>
-      <p>Опубликован только предоставленный APK. Старые сборки больше не доступны для скачивания.</p>
+      <ol><li>Скачайте последнюю версию APK.</li><li>Откройте файл на телефоне.</li><li>Если Android попросит разрешение, разрешите установку из этого источника.</li><li><?php if ($isCustom): ?>Custom — отдельное Android-приложение. Обычный LChat удалять не нужно: они могут быть установлены одновременно.<?php else: ?>У обычного APK подпись отличается от старых снятых с публикации сборок. Сохраните нужные локальные данные перед удалением старого приложения.<?php endif; ?></li></ol>
+      <p>Доступны обычный LChat и отдельная версия Custom для своих серверов. Старые сборки сняты с публикации.</p>
     </section>
   </main>
   <div id="toast" role="status" aria-live="polite" hidden>SHA-256 скопирован</div>
