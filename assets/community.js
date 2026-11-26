@@ -73,6 +73,7 @@
           await api(c.kind==='channel'?'channel.leave':'group.leave',{chat_id:c.id},true);modalElement.close();document.getElementById('mobile-back').click();await app.refreshChats();
         },'community-action danger-text'));
       }
+      if(c.kind==='channel')window.LChatDiscussions?.settings(body,c,data.discussion);
       const tabs=node('div','community-tabs'); const members=node('section','community-members'), files=node('section','community-files'); files.hidden=true;
       const membersButton=button(tr('Участники','Members'),'active',()=>{members.hidden=false;files.hidden=true;membersButton.classList.add('active');filesButton.classList.remove('active');});
       const filesButton=button(tr('Файлы','Files'),'',()=>{members.hidden=true;files.hidden=false;filesButton.classList.add('active');membersButton.classList.remove('active');});tabs.append(membersButton,filesButton);body.append(tabs,members,files);

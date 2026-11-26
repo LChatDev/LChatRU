@@ -1,7 +1,9 @@
-const CACHE = 'lchat-static-20261113-chat-sync1';
+const CACHE = 'lchat-static-20261126-discussions1';
 const STATIC = [
+  '/assets/discussions.css?v=20261126-1',
+  '/assets/discussions.js?v=20261126-1',
   '/assets/community.css?v=20261101-mobile1',
-  '/assets/community.js?v=20261030-community1',
+  '/assets/community.js?v=20261126-discussions1',
   '/assets/style.css?v=20261026-login2',
   '/assets/theme.css?v=20261013-glass1',
   '/assets/details.css?v=20261014-path1',
@@ -11,7 +13,7 @@ const STATIC = [
   '/assets/weba-pattern.svg',
   '/assets/aurora.css?v=20261026-replykb1',
   '/assets/message-extra.css?v=20261026-reactions1',
-  '/assets/app.js?v=20261113-chat-sync1',
+  '/assets/app.js?v=20261126-discussions1',
   '/assets/settings.js?v=20261026-modules1',
   '/assets/bots.js?v=20261026-botcreator1',
   '/assets/weba-ui.js?v=20261029-weba2',
