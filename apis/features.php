@@ -128,10 +128,35 @@ function ensure_features(): void {
         rewards_install();
         query('UPDATE settings SET value = ? WHERE name = ?', ['20', 'schema_version']);
     }
+    if ((int)$version['value'] < 21) {
+        $mysql = db()->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql';
+        $id = $mysql ? 'INTEGER PRIMARY KEY AUTO_INCREMENT' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+        $suffix = $mysql ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci' : '';
+        $tables = [
+            'chat_polls' => 'message_id INTEGER PRIMARY KEY, question VARCHAR(300) NOT NULL, multi_choice INTEGER NOT NULL DEFAULT 0, closes_at DATETIME NULL, FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE',
+            'chat_poll_options' => "id $id, message_id INTEGER NOT NULL, label VARCHAR(100) NOT NULL, FOREIGN KEY(message_id) REFERENCES chat_polls(message_id) ON DELETE CASCADE",
+            'chat_poll_votes' => 'message_id INTEGER NOT NULL, option_id INTEGER NOT NULL, user_id INTEGER NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(message_id, option_id, user_id), FOREIGN KEY(message_id) REFERENCES chat_polls(message_id) ON DELETE CASCADE, FOREIGN KEY(option_id) REFERENCES chat_poll_options(id) ON DELETE CASCADE, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE',
+            'message_bookmarks' => 'user_id INTEGER NOT NULL, message_id INTEGER NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(user_id, message_id), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE',
+            'chat_preferences' => "user_id INTEGER NOT NULL, chat_id INTEGER NOT NULL, folder VARCHAR(40) NOT NULL DEFAULT '', is_pinned INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(user_id, chat_id), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(chat_id) REFERENCES chats(id) ON DELETE CASCADE",
+            'group_restrictions' => 'chat_id INTEGER NOT NULL, user_id INTEGER NOT NULL, restricted_until DATETIME NULL, created_by INTEGER NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(chat_id, user_id), FOREIGN KEY(chat_id) REFERENCES chats(id) ON DELETE CASCADE, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE',
+            'group_moderation_log' => "id $id, chat_id INTEGER NOT NULL, actor_id INTEGER NOT NULL, target_id INTEGER NOT NULL, action VARCHAR(32) NOT NULL, details VARCHAR(200) NOT NULL DEFAULT '', created_at DATETIME NOT NULL, FOREIGN KEY(chat_id) REFERENCES chats(id) ON DELETE CASCADE",
+            'scheduled_messages' => "id $id, chat_id INTEGER NOT NULL, user_id INTEGER NOT NULL, body TEXT NOT NULL, send_at DATETIME NOT NULL, status VARCHAR(12) NOT NULL DEFAULT 'pending', nonce VARCHAR(64) NOT NULL UNIQUE, created_at DATETIME NOT NULL, sent_message_id INTEGER NULL, FOREIGN KEY(chat_id) REFERENCES chats(id) ON DELETE CASCADE, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(sent_message_id) REFERENCES messages(id) ON DELETE SET NULL",
+        ];
+        foreach ($tables as $table => $definition) db()->exec("CREATE TABLE IF NOT EXISTS $table ($definition)$suffix");
+        foreach (['scheduled_due' => 'scheduled_messages (status, send_at)', 'poll_options_message' => 'chat_poll_options (message_id, id)', 'bookmarks_user' => 'message_bookmarks (user_id, created_at)', 'moderation_chat' => 'group_moderation_log (chat_id, id)'] as $name => $on) {
+            try { db()->exec('CREATE INDEX ' . $name . ' ON ' . $on); }
+            catch (PDOException $e) {
+                if (($mysql && ($e->errorInfo[1] ?? 0) === 1061) || (!$mysql && str_contains(strtolower($e->getMessage()), 'already exists'))) continue;
+                throw $e;
+            }
+        }
+        query('UPDATE settings SET value = ? WHERE name = ?', ['21', 'schema_version']);
+    }
     try { bot_creator_install(); }
     catch (Throwable $e) { error_log('LChat BotCreator provision: ' . get_class($e) . ' ' . $e->getMessage()); }
     try { service_bot_install(); }
     catch (Throwable $e) { error_log('LChat service bot provision: ' . get_class($e) . ' ' . $e->getMessage()); }
+    productivity_schema();
     $ready = true;
 }
 function channel_slug(array $data): string {

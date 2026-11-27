@@ -11,15 +11,16 @@ header('X-Content-Type-Options: nosniff');
 try {
     $ctx = context();
     ensure_features();
+    try { scheduled_publish_due(); } catch (Throwable $e) { error_log('LChat scheduled messages: ' . get_class($e) . ' ' . $e->getMessage()); }
     discussion_schema();
     $action = $_GET['action'] ?? 'me';
     if ($ctx['uid'] && $action !== 'logout') require_user($ctx);
-    $read = ['me', 'chats', 'sync', 'messages', 'users', 'room.info', 'invite.info', 'contacts', 'mobile.events', 'channel.info', 'bot.callback.status', 'chat.info', 'discussion.messages'];
+    $read = ['me', 'chats', 'sync', 'messages', 'messages.search', 'scheduled.list', 'users', 'room.info', 'invite.info', 'contacts', 'mobile.events', 'channel.info', 'bot.callback.status', 'chat.info', 'discussion.messages', 'tools.search', 'tools.folders', 'tools.bookmarks', 'tools.scheduled', 'tools.group.info', 'tools.group.log'];
     $data = $_GET;
     if (!in_array($action, $read, true)) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') fail(405, 'Используйте POST.');
         if (!hash_equals($ctx['csrf'], $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) fail(403, 'Обновите страницу и повторите действие.');
-        $maxRequest = in_array($action, ['message.send', 'message.edit', 'discussion.send'], true) ? MESSAGE_REQUEST_MAX_BYTES : 65536;
+        $maxRequest = in_array($action, ['message.send', 'message.edit', 'discussion.send', 'tools.schedule.create'], true) ? MESSAGE_REQUEST_MAX_BYTES : 65536;
         if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > $maxRequest) fail(413, 'Слишком большой запрос.');
         $raw = file_get_contents('php://input', false, null, 0, $maxRequest + 1);
         if ($raw === false || strlen($raw) > $maxRequest) fail(413, 'Слишком большой запрос.');
@@ -57,6 +58,31 @@ try {
         }
         $state = account_call_state((int)$user['id']);
         result(['user_id' => (int)$user['id'], 'csrf' => $ctx['csrf'], 'cursor' => $cursor, 'messages' => $items, 'incoming_calls' => account_incoming_calls((int)$user['id'], $state), 'call_state' => $state]);
+    }
+    if ($action === 'messages.search') {
+        $user = require_user($ctx); $chatId = (int)($data['chat_id'] ?? 0); $chat = member($chatId, (int)$user['id']);
+        rate('message-search:' . $user['id'], 60, 60);
+        $term = field($data, 'q', 2, 120);
+        $before = max(0, (int)($data['before'] ?? 0));
+        $pattern = '%' . str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $term) . '%';
+        $query = 'SELECT m.id, m.chat_id, m.user_id, m.body, m.created_at, u.name, u.username FROM messages m JOIN users u ON u.id = m.user_id WHERE m.chat_id = ? AND m.body LIKE ? ESCAPE \'!\'';
+        $params = [$chatId, $pattern];
+        if ($before) { $query .= ' AND m.id < ?'; $params[] = $before; }
+        if (!empty($data['user_id'])) { $query .= ' AND m.user_id = ?'; $params[] = max(1, (int)$data['user_id']); }
+        $kind = (string)($data['kind'] ?? '');
+        if ($kind === 'files') { $query .= ' AND EXISTS (SELECT 1 FROM message_files f WHERE f.message_id = m.id)'; }
+        elseif ($kind === 'text') { $query .= ' AND NOT EXISTS (SELECT 1 FROM message_files f WHERE f.message_id = m.id) AND NOT EXISTS (SELECT 1 FROM message_events e WHERE e.message_id = m.id)'; }
+        $from = (string)($data['from'] ?? ''); $to = (string)($data['to'] ?? '');
+        foreach (['from' => $from, 'to' => $to] as $fieldName => $date) if ($date !== '') {
+            $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', $date, new DateTimeZone('UTC'));
+            if (!$parsed || $parsed->format('Y-m-d') !== $date) fail(422, 'Некорректный диапазон дат.');
+            $query .= $fieldName === 'from' ? ' AND m.created_at >= ?' : ' AND m.created_at < ?';
+            $params[] = $fieldName === 'from' ? $parsed->format('Y-m-d 00:00:00') : $parsed->modify('+1 day')->format('Y-m-d 00:00:00');
+        }
+        $rows = query($query . ' ORDER BY m.id DESC LIMIT 50', $params)->fetchAll();
+        foreach ($rows as &$row) $row['body'] = message_read($row['body'], true);
+        unset($row);
+        result(['messages' => $rows, 'has_more' => count($rows) === 50]);
     }
     if ($action === 'me') {
         $user = $ctx['uid'] ? one('SELECT id, username, name FROM users WHERE id = ?', [$ctx['uid']]) : null;
@@ -204,6 +230,7 @@ try {
         fail(404, 'Действие не найдено.');
     }
     $u = require_user($ctx); $uid = (int)$u['id'];
+    if (str_starts_with($action, 'tools.')) productivity_api($action, $data, $uid);
     if (str_starts_with($action, 'discussion.')) discussion_api($action, $data, $uid);
     if ($action === 'channel.create') {
         rate('chat-create:'.$uid,40,600);$slug=channel_slug($data);$title=field($data,'title',2,80);
@@ -216,6 +243,7 @@ try {
     if ($action === 'contacts') result(['contacts' => user_call_flags(contacts($uid))]);
     if ($action === 'invite.send') result(send_invites($uid, $ctx, $data));
     if ($action === 'chats' || $action === 'sync') {
+        tools_dispatch(5);
         query('UPDATE users SET last_seen = ? WHERE id = ? AND last_seen < ?', [stamp(), $uid, stamp(-15)]);
         $chats = query("SELECT c.id, c.kind, c.title, c.owner_id, c.invite_token, c.created_at, m.role, (SELECT slug FROM channel_details WHERE chat_id=c.id) AS channel_slug,
             SUBSTR(latest.body, 1, 2800) AS last_message, latest.created_at AS last_message_at, latest.id AS last_message_id, latest.user_id AS last_message_user_id,
@@ -225,15 +253,22 @@ try {
             FROM chats c JOIN members m ON m.chat_id = c.id LEFT JOIN messages latest ON latest.id = (SELECT MAX(id) FROM messages WHERE chat_id = c.id) WHERE m.user_id = ? ORDER BY COALESCE(latest.created_at, c.created_at) DESC, c.id DESC", [$uid, $uid, $uid])->fetchAll();
         foreach ($chats as &$c) {
             $c['last_message'] = message_read($c['last_message'], true);
+            $preferences = one('SELECT folder, is_pinned FROM chat_preferences WHERE user_id = ? AND chat_id = ?', [$uid, $c['id']]);
+            $c['folder'] = $preferences['folder'] ?? '';
+            $c['is_pinned'] = (bool)($preferences['is_pinned'] ?? false);
             if ($c['kind'] === 'direct') {
                 $p = one('SELECT u.id, u.name, u.username, u.last_seen, COALESCE(w.verified,0) AS verified FROM users u JOIN members m ON m.user_id = u.id LEFT JOIN lchat_wallets w ON w.user_id=u.id WHERE m.chat_id = ? AND u.id <> ?', [$c['id'], $uid]);
                 $c['title'] = $p['name']; $c['peer'] = user_call_flags([$p])[0];
             }
         } unset($c);
+        $organizer=[];foreach(query('SELECT chat_id,pinned,folder_id FROM chat_organizer WHERE user_id=?',[$uid])->fetchAll() as $pref)$organizer[(int)$pref['chat_id']]=$pref;
+        $grants=[];foreach(query('SELECT * FROM group_grants WHERE user_id=?',[$uid])->fetchAll() as $g)$grants[(int)$g['chat_id']]=$g;
+        foreach($chats as $i=>&$c){$pref=$organizer[(int)$c['id']]??[];$c['pinned']=(int)($pref['pinned']??0);$c['folder_id']=$pref['folder_id']??null;$c['_order']=$i;$c['can_delete_messages']=$c['kind']==='group'&&($c['role']==='owner'||!empty($grants[(int)$c['id']]['can_delete']));}unset($c);
+        usort($chats,static fn($a,$b)=>($b['pinned']<=>$a['pinned'])?:($a['_order']<=>$b['_order']));foreach($chats as &$c)unset($c['_order']);unset($c);
         $accountState = account_call_state($uid);
         $calls = account_incoming_calls($uid, $accountState);
         $activeCalls = active_calls($uid);
-        $response = ['chats' => $chats, 'calls' => $calls, 'active_calls' => $activeCalls, 'call_state' => $accountState];
+        $response = ['reminders'=>tools_reminders($uid), 'chats' => $chats, 'calls' => $calls, 'active_calls' => $activeCalls, 'call_state' => $accountState];
         if ($action === 'sync' && (int)($data['chat_id'] ?? 0)) $response += message_page((int)$data['chat_id'], $uid, $data, $activeCalls);
         result($response);
     }
@@ -292,6 +327,8 @@ try {
         } result(['id' => $c['id']]);
     }
     $chatId = (int)($data['chat_id'] ?? 0); $chat = member($chatId, $uid);
+    if (str_starts_with($action, 'poll.') || in_array($action, ['message.bookmark', 'chat.preferences', 'scheduled.create', 'scheduled.cancel', 'group.restrict', 'group.moderation-log'], true)) collaboration_api($action, $data, $uid, $chat);
+    if ($action === 'scheduled.list') collaboration_api($action, $data, $uid, $chat);
     if ($action === 'bot.callback') {
         rate('bot-callback:' . $uid, 60, 60);
         $messageId = (int)($data['message_id'] ?? 0);
@@ -313,9 +350,10 @@ try {
         result(['members' => $members, 'discussion' => $chat['kind'] === 'channel' ? discussion_link($chatId) : null]);
     }
     if ($action === 'chat.update') {
-        if (!in_array($chat['kind'], ['group', 'channel'], true) || $chat['role'] !== 'owner') fail(403, 'Только владелец может изменять группу или канал.');
+        if (!in_array($chat['kind'], ['group', 'channel'], true) || ($chat['role'] !== 'owner' && !group_can($chat,$uid,'info'))) fail(403, 'Только владелец может изменять группу или канал.');
         $title = field($data, 'title', 2, 80);
         query('UPDATE chats SET title = ? WHERE id = ?', [$title, $chatId]);
+        if($chat['kind']==='group')group_log($chatId,$uid,'group.rename',null,$title);
         result(['ok' => true, 'title' => $title]);
     }
     if ($action === 'channel.remove') {
@@ -336,6 +374,8 @@ try {
         rate('message-edit:' . $uid, 60, 60);
         $id = (int)($data['message_id'] ?? 0);
         if ($id < 1) fail(422, 'Укажите сообщение.');
+        tools_assert_write($chatId,$uid);
+        if(one('SELECT message_id FROM chat_polls WHERE message_id=?',[$id]))fail(422,'Текст опубликованного опроса менять нельзя.');
         $body = message_text($data);
         $message = one('SELECT m.id, m.user_id, m.body, m.edited_at, f.message_id AS file_id, i.message_id AS invite_id, e.message_id AS event_id FROM messages m LEFT JOIN message_files f ON f.message_id = m.id LEFT JOIN message_invites i ON i.message_id = m.id LEFT JOIN message_events e ON e.message_id = m.id WHERE m.id = ? AND m.chat_id = ?', [$id, $chatId]);
         if (!$message) fail(404, 'Сообщение не найдено.');
@@ -374,9 +414,10 @@ try {
             if (!$m) return null;
             if ((int)$m['chat_id'] !== $chatId) throw new DomainException('Сообщение находится в другом чате.');
             $admin = service_is_admin($u);
-            $owner = in_array($chat['kind'], ['group','channel'], true) && $chat['role'] === 'owner';
+            $owner = (in_array($chat['kind'], ['group','channel'], true) && $chat['role'] === 'owner') || group_can($chat,$uid,'delete');
             if ((int)$m['user_id'] !== $uid && !$owner && !$admin) fail(403, 'Можно удалять только свои сообщения.');
             delete_message_row($id, $chatId);
+            if($chat['kind']==='group')group_log($chatId,$uid,'message.delete',$id);
             if ($admin) admin_audit($uid,'message.delete','chat:'.$chatId.' message:'.$id);
             return $m['stored_name'];
         });
@@ -384,6 +425,7 @@ try {
         result(['ok'=>true]);
     }
     if ($action === 'message.send') {
+        tools_assert_write($chatId,$uid);
         if ($chat['kind'] === 'channel' && $chat['role'] !== 'owner') fail(403, 'Публиковать в канале может только владелец.');
         rate('message:' . $uid, 80, 60);
         $body = message_text($data); $nonce = field($data, 'nonce', 16, 64);
@@ -408,8 +450,8 @@ try {
         query('UPDATE members SET last_read = CASE WHEN last_read < ? THEN ? ELSE last_read END WHERE chat_id = ? AND user_id = ?', [$last, $last, $chatId, $uid]); result(['ok' => true]);
     }
     if ($action === 'group.invite-reset') {
-        if ($chat['role'] !== 'owner') fail(403, 'Только владелец может обновить ссылку.');
-        $token = bin2hex(random_bytes(24)); query('UPDATE chats SET invite_token = ? WHERE id = ?', [$token, $chatId]); result(['token' => $token]);
+        if ($chat['kind']!=='group'||!group_can($chat,$uid,'info')) fail(403, 'Нет права обновлять ссылку группы.');
+        $token = bin2hex(random_bytes(24)); query('UPDATE chats SET invite_token = ? WHERE id = ?', [$token, $chatId]); group_log($chatId,$uid,'group.invite-reset'); result(['token' => $token]);
     }
     if ($action === 'group.leave') {
         if ($chat['kind'] !== 'group') fail(422, 'Это личный чат.');
@@ -417,10 +459,13 @@ try {
         query('DELETE FROM members WHERE chat_id = ? AND user_id = ?', [$chatId, $uid]); result(['ok' => true]);
     }
     if ($action === 'group.remove') {
-        if ($chat['kind'] !== 'group' || $chat['role'] !== 'owner') fail(403, 'Только владелец может исключать участников.');
+        if ($chat['kind'] !== 'group' || !group_can($chat,$uid,'members')) fail(403, 'Нет права исключать участников.');
         $other = (int)($data['user_id'] ?? 0);
-        if ($other === $uid) fail(422, 'Нельзя исключить владельца.');
-        query('DELETE FROM members WHERE chat_id = ? AND user_id = ?', [$chatId, $other]); result(['ok' => true]);
+        $target=member($chatId,$other);
+        if ($other === $uid || $target['role']==='owner') fail(422, 'Нельзя исключить владельца или себя.');
+        $g=one('SELECT can_delete+can_info+can_members+can_restrict AS n FROM group_grants WHERE chat_id=? AND user_id=?',[$chatId,$other]);
+        if($chat['role']!=='owner'&&(int)($g['n']??0)>0)fail(403,'Исключать администратора может только владелец.');
+        query('DELETE FROM members WHERE chat_id = ? AND user_id = ?', [$chatId, $other]); group_log($chatId,$uid,'member.remove',$other); result(['ok' => true]);
     }
     fail(404, 'Действие не найдено.');
 } catch (DomainException $e) { fail(409, $e->getMessage()); }
