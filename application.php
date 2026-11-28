@@ -4,25 +4,11 @@ header('Cache-Control: no-store, max-age=0');
 header('X-Content-Type-Options: nosniff');
 
 $isCustom = ($_GET['branch'] ?? '') === 'userhosts';
-$versions = [
-    [
-        'version' => '2.2 (220)',
-        'date' => '2026-11-26',
-        'size' => '486.0 KB',
-        'sha256' => '10bc1cda1585160d771b6808810371ae800182c46504ce7884ba505e5fb8e5f3',
-        'file' => 'https://data.lbs.su/lchat-apps/LChat.apk?v=220',
-        'latest' => true,
-        'changes' => ['Файл предоставлен владельцем и загружен без пересборки.','Обновляется поверх LChat 2.1 с той же подписью.'],
-    ],
-];
+$versions = [[
+ 'version'=>'2.4 (240)','date'=>'2026-11-28','size'=>'489.9 KB','sha256'=>'4e9fa5836b4c3f10fa13374f933983d862ef8c0d4447572de7cac804b0b55f68','file'=>'https://data.lbs.su/lchat-apps/LChat.apk?v=240','latest'=>true,'changes'=>['APK предоставлен владельцем и опубликован без пересборки.','Подпись сверена с предыдущей опубликованной версией.'],
+]];
 if ($isCustom) $versions = [[
-    'version' => '1.1-custom (2.2)',
-    'date' => '2026-11-26',
-    'size' => '496.1 KB',
-    'sha256' => '5f2a06eb6f076587f00d0d8338eef6b82a18efb12ed194c2db77e41cb2545c15',
-    'file' => 'https://data.lbs.su/lchat-apps/userhosts/LChatCustom.apk?v=11',
-    'latest' => true,
-    'changes' => ['APK для пользовательских серверов LChat, предоставленный владельцем.','Отдельное приложение: можно установить рядом с обычным LChat.'],
+ 'version'=>'1.3-custom (2.4)','date'=>'2026-11-28','size'=>'500.1 KB','sha256'=>'62f11c73e9da30b5cef4112909025adfc640275d42e605bbe75014614fc3f45c','file'=>'https://data.lbs.su/lchat-apps/userhosts/LChatCustom.apk?v=13','latest'=>true,'changes'=>['Обновление версии для своего сервера, без пересборки.','Устанавливается отдельно от обычного LChat.'],
 ]];
 
 ?>
@@ -32,7 +18,7 @@ if ($isCustom) $versions = [[
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#212121">
-  <meta name="description" content="Версии приложения LChat для Android">
+  <meta name="description" content="Приложения LChat для Android и Windows">
   <title>Приложение LChat</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/application.css?v=20261101-apps1">
@@ -40,7 +26,7 @@ if ($isCustom) $versions = [[
 <body class="lchat-secondary lchat-apps">
   <header class="topbar">
     <a class="back" href="index.php" aria-label="Вернуться в LChat">←</a>
-    <a class="brand" href="index.php"><span class="brand-mark">L</span><span>LChat<small>Приложение для Android</small></span></a>
+    <a class="brand" href="index.php"><span class="brand-mark">L</span><span>LChat<small>Android и Windows</small></span></a>
   </header>
   <main>
     <section class="hero">
@@ -49,7 +35,7 @@ if ($isCustom) $versions = [[
         <span class="eyebrow">ОФИЦИАЛЬНЫЕ СБОРКИ LCHAT</span>
         <h1><?= $isCustom ? 'LChat Custom — свой сервер' : 'Приложение LChat' ?></h1>
         <p>Актуальный APK LChat, предоставленный владельцем проекта. Старые сборки сняты с публикации.</p>
-        <div class="requirements"><span>Android 7.0+</span><span><?= $isCustom ? 'Custom · 1.1 · code 11' : 'LChat · 2.2 · code 220' ?></span></div>
+        <div class="requirements"><span>Android 7.0+</span><span><?= $isCustom ? 'Custom · 1.3 · code 13' : 'LChat · 2.4 · code 240' ?></span></div>
       </div>
     </section>
 
@@ -71,9 +57,10 @@ if ($isCustom) $versions = [[
       <?php endforeach; ?>
     </section>
 
+<?php if (!$isCustom): ?><section class="versions" aria-labelledby="windows-title"><div class="section-heading"><h2 id="windows-title">LChat для Windows</h2></div><article class="version-card"><div class="version-main"><div class="version-number"><span>Windows · установщик</span><b>Обновление</b></div><p class="meta">2026-11-28 · 107.9 MB</p><p>Распакуйте ZIP и запустите установщик EXE.</p></div><div class="version-actions"><a class="download" href="https://data.lbs.su/lchat-apps/windows/LChat-Windows-Setup.zip?v=20261128" download>Скачать ZIP ↓</a><button class="checksum" type="button" data-hash="232527dc5439fb03bd90df724d27fb25d6f371b6c0ec3bc4e7197645e56c3320">SHA-256</button></div></article><article class="version-card"><div class="version-main"><div class="version-number"><span>Windows · без установки</span><b>Обновление</b></div><p class="meta">2026-11-28 · 97.9 MB</p><p>Распакуйте ZIP и запустите EXE из полученной папки.</p></div><div class="version-actions"><a class="download" href="https://data.lbs.su/lchat-apps/windows/LChat-Windows-Portable.zip?v=20261128" download>Скачать ZIP ↓</a><button class="checksum" type="button" data-hash="ab6e7f852df0cb76d761a385a469da96e3b0e4c76fee859483af0a43545a0833">SHA-256</button></div></article></section><?php endif; ?>
     <section class="install">
       <h2>Как установить</h2>
-      <ol><li>Скачайте последнюю версию APK.</li><li>Откройте файл на телефоне.</li><li>Если Android попросит разрешение, разрешите установку из этого источника.</li><li><?php if ($isCustom): ?>Custom — отдельное Android-приложение. Обычный LChat удалять не нужно: они могут быть установлены одновременно.<?php else: ?>LChat 2.2 можно установить поверх версии 2.1. Очень старые сборки с другой подписью могут потребовать удаления приложения; сначала сохраните нужные локальные данные.<?php endif; ?></li></ol>
+      <ol><li>Скачайте последнюю версию APK.</li><li>Откройте файл на телефоне.</li><li>Если Android попросит разрешение, разрешите установку из этого источника.</li><li><?php if ($isCustom): ?>Custom — отдельное Android-приложение. Обычный LChat удалять не нужно: они могут быть установлены одновременно.<?php else: ?>LChat 2.4 можно установить поверх предыдущей версии с той же подписью. Очень старые сборки с другой подписью могут потребовать удаления приложения; сначала сохраните нужные локальные данные.<?php endif; ?></li></ol>
       <p>Доступны обычный LChat и отдельная версия Custom для своих серверов. Старые сборки сняты с публикации.</p>
     </section>
   </main>
